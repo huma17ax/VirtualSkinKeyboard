@@ -1,9 +1,6 @@
 from namedpipe import NamedPipeClient
 from threading import Thread
-import numpy as np
-import cv2
 import time
-from queue import Empty
 
 class ImageSender(Thread):
     def __init__(self, sh_image):
