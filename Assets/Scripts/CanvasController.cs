@@ -75,5 +75,6 @@ public class CanvasController : MonoBehaviour
     {
         this.imageReceiver.Stop();
         this.landmarksReceiver.Stop();
+        this.touchReceiver.Stop();
     }
 }
