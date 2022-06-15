@@ -56,10 +56,12 @@ public class CanvasController : MonoBehaviour
 
         Vector2[] v;
         if (this.sh_landmarks.TryGet(out v)) {
-            this.circles[0].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[0].x*640-320, -(v[0].y*480-240), 0);
-            this.circles[1].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[1].x*640-320, -(v[1].y*480-240), 0);
-            this.circles[2].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[2].x*640-320, -(v[2].y*480-240), 0);
-            this.circles[3].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[3].x*640-320, -(v[3].y*480-240), 0);
+            float width = 640 * this.rawImage.GetComponent<RectTransform>().localScale.x;
+            float height = 480 * this.rawImage.GetComponent<RectTransform>().localScale.y;
+            this.circles[0].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[0].x*width-width/2, -(v[0].y*height-height/2), 0);
+            this.circles[1].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[1].x*width-width/2, -(v[1].y*height-height/2), 0);
+            this.circles[2].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[2].x*width-width/2, -(v[2].y*height-height/2), 0);
+            this.circles[3].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[3].x*width-width/2, -(v[3].y*height-height/2), 0);
         }
 
         bool[] b;
