@@ -10,7 +10,7 @@ from fisheye_undistort import undistort
 from touch_detector import TouchDetector
 from touches_sender import TouchesSender
 
-CAMERA_INDEX = 2
+CAMERA_INDEX = 0
 
 capture = cv2.VideoCapture(CAMERA_INDEX)
 
