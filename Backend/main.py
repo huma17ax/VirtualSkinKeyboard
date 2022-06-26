@@ -1,6 +1,8 @@
 import cv2
 import time
 
+from marker_detector import detect_marker
+
 from hand_tracker import HandTracker
 from image_sender import ImageSender
 from landmarks_sender import LandmarksSender
@@ -40,7 +42,7 @@ try:
         frame = cv2.flip(frame, -1)
         frame = undistort(frame)
 
-        sh_image1.set(frame)
+        sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
 
         time.sleep(0.02)
