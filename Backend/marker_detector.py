@@ -34,3 +34,33 @@ def calc_board_corners(corners):
 
     return e
 
+def homography(corners):
+    if len(corners) == 0:
+        return None
+    
+    dst = np.array([[0,0], [1,0], [1,1], [0,1]])
+
+    matrix, _ = cv2.findHomography(corners[0][0], dst, cv2.RANSAC,10.0)
+    matrix = np.matrix(matrix)
+
+    a = np.array(np.dot(matrix.I, np.array([[-6,0,1]]).T).T)
+    b = np.array(np.dot(matrix.I, np.array([[0,0,1]]).T).T)
+    c = np.array(np.dot(matrix.I, np.array([[0,1,1]]).T).T)
+    d = np.array(np.dot(matrix.I, np.array([[-6,1,1]]).T).T)
+    e = np.array([a[0][:2]/a[0][2], b[0][:2]/b[0][2], c[0][:2]/c[0][2], d[0][:2]/d[0][2]]).astype('int32')
+
+    return e
+
+# 手動実行
+def generate_marker(index):
+    dir_mark = '.\markers\\'
+    size_mark = 400
+
+    dict_aruco = aruco.Dictionary_get(aruco.DICT_4X4_50)
+
+    img = aruco.drawMarker(dict_aruco, index, size_mark)
+    cv2.imwrite(dir_mark+'marker.png', img)
+    
+    white = np.ones((600, 600)) * 256
+    white[100:500, 100:500] = img
+    cv2.imwrite(dir_mark+'marker_mini.png', white)
