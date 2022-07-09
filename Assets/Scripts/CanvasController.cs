@@ -19,6 +19,7 @@ public class CanvasController : MonoBehaviour
     private Color32[] colors;
 
     private GameObject[] circles;
+    private GameObject keyboard;
 
     void Start()
     {
@@ -45,6 +46,7 @@ public class CanvasController : MonoBehaviour
         this.circles[2] = GameObject.Find("Canvas/Circle3");
         this.circles[3] = GameObject.Find("Canvas/Circle4");
         Debug.Log(this.circles[0]);
+        this.keyboard = GameObject.Find("Canvas/Keyboard");
     }
 
     void Update()
