@@ -18,11 +18,11 @@ capture = cv2.VideoCapture(CAMERA_INDEX)
 
 print(capture.get(cv2.CAP_PROP_FPS))
 
-sh_image1 = SharedData()
-sh_image2 = SharedData()
-sh_landmarks = SharedData()
-sh_image_and_landmarks = SharedData()
-sh_touches = SharedData()
+sh_image1 = SharedData("image1")
+sh_image2 = SharedData("image2")
+sh_landmarks = SharedData("landmarks")
+sh_image_and_landmarks = SharedData("image_and_land")
+sh_touches = SharedData("touches")
 
 image_sender = ImageSender(sh_image1)
 landmarks_sender = LandmarksSender(sh_landmarks)
@@ -52,4 +52,19 @@ except:
     touches_sender.stop()
     tracker.stop()
     detector.stop()
+    print("sh_image1: ", end="")
+    sh_image1.show_count()
+    print("sh_image2: ", end="")
+    sh_image2.show_count()
+    print("sh_landmarks: ", end="")
+    sh_landmarks.show_count()
+    print("sh_image_and_landmarks: ", end="")
+    sh_image_and_landmarks.show_count()
+    print("sh_touches: ", end="")
+    sh_touches.show_count()
+
+    import json
+    with open('.\hist.json', 'w') as f:
+        json.dump(SharedData.histories, f)
+
     raise
