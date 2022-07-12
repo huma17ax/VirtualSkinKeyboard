@@ -22,7 +22,7 @@ public class ImageReceiver: ThreadRunner
                     if (this.token.IsCancellationRequested) break;
                     if (pipe.status == NamedPipeServer.Status.Connected)
                     {
-                        byte[] bytes = pipe.Read(640 * 480 * 3);
+                        byte[] bytes = pipe.Read(640 * 480 * 4);
                         if (bytes == null) break;
                         this.sh_colors.Set(BytesToColors(bytes));
                     }
@@ -41,16 +41,14 @@ public class ImageReceiver: ThreadRunner
 
     private Color32[] BytesToColors(byte[] bytes)
     {
-        Color32[] colors = new Color32[bytes.Length / 3];
+        Color32[] colors = new Color32[bytes.Length / 4];
 
         for (int i = 0; i < colors.Length; i++)
         {
-            // colors[i] = new Color32(bytes[3 * i + 0], bytes[3 * i + 1], bytes[3 * i + 2], 255);
-            // colors[i] = new Color32(255, 255, 255, 0);
-            colors[i].r = bytes[3 * i + 0];
-            colors[i].g = bytes[3 * i + 1];
-            colors[i].b = bytes[3 * i + 2];
-            colors[i].a = 255;
+            colors[i].r = bytes[4 * i + 0];
+            colors[i].g = bytes[4 * i + 1];
+            colors[i].b = bytes[4 * i + 2];
+            colors[i].a = bytes[4 * i + 3];
         }
 
         return colors;
