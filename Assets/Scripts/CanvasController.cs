@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class CanvasController : MonoBehaviour
 {
     private ImageReceiver imageReceiver;
-    private SharedData<Color32[]> sh_image;
+    private SharedData<Color32[]> sh_background;
+    private SharedData<Color32[]> sh_foreground;
 
     private LandmarksReceiver landmarksReceiver;
     private SharedData<Vector2[]> sh_landmarks;
@@ -15,7 +16,8 @@ public class CanvasController : MonoBehaviour
     private SharedData<bool[]> sh_touches;
 
     private RawImage rawImage;
-    private Texture2D texture;
+    private Texture2D background;
+    private Texture2D foreground;
     private Color32[] colors;
 
     private GameObject[] circles;
@@ -23,12 +25,15 @@ public class CanvasController : MonoBehaviour
     void Start()
     {
         this.rawImage = GetComponent<RawImage>();
-        this.texture = new Texture2D(640, 480);
-        this.rawImage.texture = this.texture;
+        this.background = new Texture2D(640, 480);
+        this.rawImage.texture = this.background;
+        this.foreground = new Texture2D(640, 480);
+        GameObject.Find("Canvas/Foreground").GetComponent<RawImage>().texture = this.foreground;
         this.colors = new Color32[0];
 
-        this.sh_image = new SharedData<Color32[]>();
-        this.imageReceiver = new ImageReceiver(this.sh_image);
+        this.sh_background = new SharedData<Color32[]>();
+        this.sh_foreground = new SharedData<Color32[]>();
+        this.imageReceiver = new ImageReceiver(this.sh_background, this.sh_foreground);
         this.imageReceiver.Start();
 
         this.sh_landmarks = new SharedData<Vector2[]>();
@@ -49,9 +54,13 @@ public class CanvasController : MonoBehaviour
 
     void Update()
     {
-        if (this.sh_image.TryGet(out this.colors)) {
-            this.texture.SetPixels32(this.colors);
-            this.texture.Apply();
+        if (this.sh_background.TryGet(out this.colors)) {
+            this.background.SetPixels32(this.colors);
+            this.background.Apply();
+        }
+        if (this.sh_foreground.TryGet(out this.colors)) {
+            this.foreground.SetPixels32(this.colors);
+            this.foreground.Apply();
         }
 
         Vector2[] v;
