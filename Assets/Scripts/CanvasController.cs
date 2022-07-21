@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class CanvasController : MonoBehaviour
 {
     private ImageReceiver imageReceiver;
-    private SharedData<Color32[]> sh_image;
+    private SharedData<Color32[]> sh_background;
+    private SharedData<Color32[]> sh_foreground;
 
     private LandmarksReceiver landmarksReceiver;
     private SharedData<Vector2[]> sh_landmarks;
@@ -15,20 +16,30 @@ public class CanvasController : MonoBehaviour
     private SharedData<bool[]> sh_touches;
 
     private RawImage rawImage;
-    private Texture2D texture;
+    private Texture2D background;
+    private Texture2D foreground;
     private Color32[] colors;
 
     private GameObject[] circles;
+    private GameObject keyboard;
+    private GameObject inputs;
+
+    private bool[] pre = {false, false, false, false};
+
+    private char[] hovered_chars = {' ', ' ', ' ', ' '};
 
     void Start()
     {
         this.rawImage = GetComponent<RawImage>();
-        this.texture = new Texture2D(640, 480);
-        this.rawImage.texture = this.texture;
+        this.background = new Texture2D(640, 480);
+        this.rawImage.texture = this.background;
+        this.foreground = new Texture2D(640, 480);
+        GameObject.Find("Canvas/Foreground").GetComponent<RawImage>().texture = this.foreground;
         this.colors = new Color32[0];
 
-        this.sh_image = new SharedData<Color32[]>();
-        this.imageReceiver = new ImageReceiver(this.sh_image);
+        this.sh_background = new SharedData<Color32[]>();
+        this.sh_foreground = new SharedData<Color32[]>();
+        this.imageReceiver = new ImageReceiver(this.sh_background, this.sh_foreground);
         this.imageReceiver.Start();
 
         this.sh_landmarks = new SharedData<Vector2[]>();
@@ -45,13 +56,19 @@ public class CanvasController : MonoBehaviour
         this.circles[2] = GameObject.Find("Canvas/Circle3");
         this.circles[3] = GameObject.Find("Canvas/Circle4");
         Debug.Log(this.circles[0]);
+        this.keyboard = GameObject.Find("Canvas/Keyboard");
+        this.inputs = GameObject.Find("Canvas/Inputs");
     }
 
     void Update()
     {
-        if (this.sh_image.TryGet(out this.colors)) {
-            this.texture.SetPixels32(this.colors);
-            this.texture.Apply();
+        if (this.sh_background.TryGet(out this.colors)) {
+            this.background.SetPixels32(this.colors);
+            this.background.Apply();
+        }
+        if (this.sh_foreground.TryGet(out this.colors)) {
+            this.foreground.SetPixels32(this.colors);
+            this.foreground.Apply();
         }
 
         Vector2[] v;
@@ -64,12 +81,52 @@ public class CanvasController : MonoBehaviour
             this.circles[3].GetComponent<RectTransform>().anchoredPosition = new Vector3(v[3].x*width-width/2, -(v[3].y*height-height/2), 0);
         }
 
+        CalcHoverKey();
+
         bool[] b;
         if (this.sh_touches.TryGet(out b)) {
             this.circles[0].GetComponent<RectTransform>().localScale = new Vector3(b[0] ? 2 : 1, b[0] ? 2 : 1 , 1);
             this.circles[1].GetComponent<RectTransform>().localScale = new Vector3(b[1] ? 2 : 1, b[1] ? 2 : 1 , 1);
             this.circles[2].GetComponent<RectTransform>().localScale = new Vector3(b[2] ? 2 : 1, b[2] ? 2 : 1 , 1);
             this.circles[3].GetComponent<RectTransform>().localScale = new Vector3(b[3] ? 2 : 1, b[3] ? 2 : 1 , 1);
+
+            for (int i=0; i<4; i++) {
+                if (pre[i]==false && b[i]==true) this.inputs.GetComponent<Text>().text += this.hovered_chars[i];
+                if (this.inputs.GetComponent<Text>().text.Length > 35) this.inputs.GetComponent<Text>().text.Remove(0,1);
+            }
+            pre = b;
+        }
+
+    }
+
+    private void CalcHoverKey() {
+        string top_keys = "QWERTYUIOP";
+        string mid_keys = "ASDFGHJKL";
+        string bottom_keys = "ZXCVBNM";
+
+        for (int i=0; i<4; i++) {
+            RectTransform rt = this.keyboard.GetComponent<RectTransform>();
+            Vector2 normalized_position = this.circles[i].GetComponent<RectTransform>().anchoredPosition/ (rt.sizeDelta * rt.localScale) + new Vector2(0.5f, 0.5f);
+
+            if (normalized_position.y < 1f/3f) {
+                // bottom row
+                int x = (int)Mathf.Floor(normalized_position.x*10f-1f);
+                if (x < 0 || x > 6) this.hovered_chars[i] = ' ';
+                else this.hovered_chars[i] = bottom_keys[x];
+            }
+            else if (normalized_position.y < 2f/3f) {
+                // middle row
+                int x = (int)Mathf.Floor(normalized_position.x*10f-0.5f);
+                if (x < 0 || x > 8) this.hovered_chars[i] = ' ';
+                else this.hovered_chars[i] = mid_keys[x];
+            }
+            else {
+                // top row
+                int x = (int)Mathf.Floor(normalized_position.x*10f);
+                if (x < 0 || x > 9) this.hovered_chars[i] = ' ';
+                else this.hovered_chars[i] = top_keys[x];
+            }
+
         }
     }
 
