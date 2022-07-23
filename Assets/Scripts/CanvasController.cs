@@ -134,7 +134,16 @@ public class CanvasController : MonoBehaviour
 
         for (int i=0; i<4; i++) {
             RectTransform rt = this.keyboard.GetComponent<RectTransform>();
-            Vector2 normalized_position = this.circles[i].GetComponent<RectTransform>().anchoredPosition/ (rt.sizeDelta * rt.localScale) + new Vector2(0.5f, 0.5f);
+            float angle = Mathf.Atan2(
+                this.circles[i].GetComponent<RectTransform>().anchoredPosition.y - rt.anchoredPosition.y,
+                this.circles[i].GetComponent<RectTransform>().anchoredPosition.x - rt.anchoredPosition.x
+            ) / (2*Mathf.PI) * 360;
+            float dist = Vector2.Distance(rt.anchoredPosition, this.circles[i].GetComponent<RectTransform>().anchoredPosition);
+            Vector2 normalized_position = 
+                new Vector2(
+                    dist*Mathf.Cos((angle-rt.localRotation.eulerAngles.z)/360*(2*Mathf.PI)),
+                    dist*Mathf.Sin((angle-rt.localRotation.eulerAngles.z)/360*(2*Mathf.PI))
+                ) / (rt.sizeDelta * rt.localScale) + new Vector2(0.5f, 0.5f);
 
             if (normalized_position.y < 1f/3f) {
                 // bottom row
