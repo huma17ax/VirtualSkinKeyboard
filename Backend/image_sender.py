@@ -34,7 +34,9 @@ class ImageSender(Thread):
                 else:
                     mask = watershed.hand_mask(image, hand_landmarks)
 
-                byte_image = np.concatenate([image[:,:,[2,1,0]], mask[:,:,np.newaxis]], axis=2).tobytes()
+                concat_image = np.concatenate([image[:,:,[2,1,0]], mask[:,:,np.newaxis]], axis=2)
+                concat_image = np.flipud(concat_image)
+                byte_image = concat_image.tobytes()
                 self.pipe.write(byte_image)
             time.sleep(0.02)
         print('IMAGE SENDER END.')

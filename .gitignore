@@ -4,6 +4,11 @@
 /[Aa]ssets/Oculus/
 /[Aa]ssets/OpenCV+Unity/
 /[Aa]ssets/XR/
+/[Aa]ssets/Data/
+/[Aa]ssets/NyARToolkitCS/
+/[Aa]ssets/NyARUnityUtils/
+/[Aa]ssets/sample/
+/[Aa]ssets/sample.webplayer/
 
 # This .gitignore file should be placed at the root of your Unity project directory
 #

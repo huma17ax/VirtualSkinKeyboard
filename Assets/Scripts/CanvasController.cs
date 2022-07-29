@@ -23,6 +23,7 @@ public class CanvasController : MonoBehaviour
     private GameObject[] circles;
     private GameObject keyboard;
     private GameObject inputs;
+    private ARMarkerDetector detector;
 
     private bool[] pre = {false, false, false, false};
 
@@ -58,6 +59,9 @@ public class CanvasController : MonoBehaviour
         Debug.Log(this.circles[0]);
         this.keyboard = GameObject.Find("Canvas/Keyboard");
         this.inputs = GameObject.Find("Canvas/Inputs");
+
+        this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
+        this.detector.WakeUp(this.background);
     }
 
     void Update()
@@ -65,6 +69,7 @@ public class CanvasController : MonoBehaviour
         if (this.sh_background.TryGet(out this.colors)) {
             this.background.SetPixels32(this.colors);
             this.background.Apply();
+            this.detector.TextureUpdated();
         }
         if (this.sh_foreground.TryGet(out this.colors)) {
             this.foreground.SetPixels32(this.colors);
@@ -97,6 +102,29 @@ public class CanvasController : MonoBehaviour
             pre = b;
         }
 
+        SetKeyboardTransform();
+    }
+
+    private void SetKeyboardTransform() {
+
+        Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
+        float rate = 6f;
+        Vector2 pos = this.detector.markerPosition + axis*rate/2;
+
+        this.keyboard.GetComponent<RectTransform>().anchoredPosition = 
+            new Vector3(
+                pos.x * 640 * this.rawImage.GetComponent<RectTransform>().localScale.x,
+                pos.y * 480 * this.rawImage.GetComponent<RectTransform>().localScale.y,
+                0);
+        
+        float angle = Mathf.Atan2(-axis.y, -axis.x);
+        this.keyboard.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 360 * angle / (2*Mathf.PI));
+
+        float scale = rate * Vector2.Distance(
+            new Vector2(640 * this.detector.markerPosition.x, 480 * this.detector.markerPosition.y),
+            new Vector2(640 * this.detector.nextPosition.x, 480 * this.detector.nextPosition.y)
+        ) / this.keyboard.GetComponent<RectTransform>().sizeDelta.x;
+        this.keyboard.GetComponent<RectTransform>().localScale = new Vector3(scale, scale, 0);
     }
 
     private void CalcHoverKey() {
@@ -106,7 +134,16 @@ public class CanvasController : MonoBehaviour
 
         for (int i=0; i<4; i++) {
             RectTransform rt = this.keyboard.GetComponent<RectTransform>();
-            Vector2 normalized_position = this.circles[i].GetComponent<RectTransform>().anchoredPosition/ (rt.sizeDelta * rt.localScale) + new Vector2(0.5f, 0.5f);
+            float angle = Mathf.Atan2(
+                this.circles[i].GetComponent<RectTransform>().anchoredPosition.y - rt.anchoredPosition.y,
+                this.circles[i].GetComponent<RectTransform>().anchoredPosition.x - rt.anchoredPosition.x
+            ) / (2*Mathf.PI) * 360;
+            float dist = Vector2.Distance(rt.anchoredPosition, this.circles[i].GetComponent<RectTransform>().anchoredPosition);
+            Vector2 normalized_position = 
+                new Vector2(
+                    dist*Mathf.Cos((angle-rt.localRotation.eulerAngles.z)/360*(2*Mathf.PI)),
+                    dist*Mathf.Sin((angle-rt.localRotation.eulerAngles.z)/360*(2*Mathf.PI))
+                ) / (rt.sizeDelta * rt.localScale) + new Vector2(0.5f, 0.5f);
 
             if (normalized_position.y < 1f/3f) {
                 // bottom row
