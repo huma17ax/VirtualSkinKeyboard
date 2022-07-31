@@ -47,10 +47,23 @@ try:
         sh_image2.set(frame)
 
         time.sleep(0.02)
+
+        if not image_sender.is_alive():
+            break
+        if not landmarks_sender.is_alive():
+            break
+        if not touches_sender.is_alive():
+            break
+        if not tracker.is_alive():
+            break
+        if not detector.is_alive():
+            break
 except:
-    image_sender.stop()
-    landmarks_sender.stop()
-    touches_sender.stop()
-    tracker.stop()
-    detector.stop()
-    raise
+    import traceback
+    traceback.print_exc()
+
+image_sender.stop()
+landmarks_sender.stop()
+touches_sender.stop()
+tracker.stop()
+detector.stop()
