@@ -108,7 +108,7 @@ public class CanvasController : MonoBehaviour
     private void SetKeyboardTransform() {
 
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
-        float rate = 6f;
+        float rate = 11f;
         Vector2 pos = this.detector.markerPosition + axis*rate/2;
 
         this.keyboard.GetComponent<RectTransform>().anchoredPosition = 
