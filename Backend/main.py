@@ -20,18 +20,19 @@ print(capture.get(cv2.CAP_PROP_FPS))
 
 sh_image1 = SharedData("image1")
 sh_image2 = SharedData("image2")
-sh_landmarks = SharedData("landmarks")
+sh_landmarks1 = SharedData("landmarks1")
+sh_landmarks2 = SharedData("landmarks2")
 sh_image_and_landmarks = SharedData("image_and_land")
 sh_touches = SharedData("touches")
 
-image_sender = ImageSender(sh_image1)
-landmarks_sender = LandmarksSender(sh_landmarks)
+image_sender = ImageSender(sh_image1, sh_landmarks2)
+landmarks_sender = LandmarksSender(sh_landmarks1)
 touches_sender = TouchesSender(sh_touches)
 image_sender.start()
 landmarks_sender.start()
 touches_sender.start()
 
-tracker = HandTracker(sh_image2, sh_landmarks, sh_image_and_landmarks)
+tracker = HandTracker(sh_image2, sh_landmarks1, sh_landmarks2, sh_image_and_landmarks)
 detector = TouchDetector(sh_image_and_landmarks, sh_touches)
 tracker.start()
 detector.start()
@@ -41,30 +42,46 @@ try:
         ret, frame = capture.read()
         frame = cv2.flip(frame, -1)
         frame = undistort(frame)
+        frame = cv2.flip(frame, -1)
 
         sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
 
         time.sleep(0.02)
+
+        if not image_sender.is_alive():
+            break
+        if not landmarks_sender.is_alive():
+            break
+        if not touches_sender.is_alive():
+            break
+        if not tracker.is_alive():
+            break
+        if not detector.is_alive():
+            break
 except:
-    image_sender.stop()
-    landmarks_sender.stop()
-    touches_sender.stop()
-    tracker.stop()
-    detector.stop()
-    print("sh_image1: ", end="")
-    sh_image1.show_count()
-    print("sh_image2: ", end="")
-    sh_image2.show_count()
-    print("sh_landmarks: ", end="")
-    sh_landmarks.show_count()
-    print("sh_image_and_landmarks: ", end="")
-    sh_image_and_landmarks.show_count()
-    print("sh_touches: ", end="")
-    sh_touches.show_count()
+    import traceback
+    traceback.print_exc()
 
-    import json
-    with open('.\hist.json', 'w') as f:
-        json.dump(SharedData.histories, f)
+image_sender.stop()
+landmarks_sender.stop()
+touches_sender.stop()
+tracker.stop()
+detector.stop()
 
-    raise
+print("sh_image1: ", end="")
+sh_image1.show_count()
+print("sh_image2: ", end="")
+sh_image2.show_count()
+print("sh_landmarks1: ", end="")
+sh_landmarks1.show_count()
+print("sh_landmarks2: ", end="")
+sh_landmarks2.show_count()
+print("sh_image_and_landmarks: ", end="")
+sh_image_and_landmarks.show_count()
+print("sh_touches: ", end="")
+sh_touches.show_count()
+
+import json
+with open('.\hist.json', 'w') as f:
+    json.dump(SharedData.histories, f)
