@@ -42,6 +42,7 @@ try:
         ret, frame = capture.read()
         frame = cv2.flip(frame, -1)
         frame = undistort(frame)
+        frame = cv2.flip(frame, -1)
 
         sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
