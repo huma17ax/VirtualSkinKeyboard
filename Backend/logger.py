@@ -24,11 +24,11 @@ def output():
 
 def logging(data):
     time = str(math.floor(uptime.uptime() * 1000 * 1000))
-    callee = inspect.stack()[1]
-    if "self" in callee.frame.f_locals:
-        src_name = callee.frame.f_locals["self"].__class__.__name__
+    caller = inspect.stack()[1]
+    if "self" in caller.frame.f_locals:
+        src_name = caller.frame.f_locals["self"].__class__.__name__
     else:
-        src_name = os.path.splitext(os.path.basename(callee.filename))[0] + '/' + callee.function
+        src_name = os.path.splitext(os.path.basename(caller.filename))[0] + '/' + caller.function
     logs.append([time, src_name, json.dumps(data)])
 
 def recording(_frame):
