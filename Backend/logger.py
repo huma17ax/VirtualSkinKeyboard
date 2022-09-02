@@ -23,7 +23,7 @@ def output():
         rec.release()
 
 def logging(data):
-    time = str(math.floor(uptime.uptime() * 1000))
+    time = str(math.floor(uptime.uptime() * 1000 * 1000))
     callee = inspect.stack()[1]
     if "self" in callee.frame.f_locals:
         src_name = callee.frame.f_locals["self"].__class__.__name__
