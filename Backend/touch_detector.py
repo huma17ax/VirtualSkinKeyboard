@@ -1,6 +1,7 @@
 from threading import Thread
 from keras.models import load_model
 import time
+from logger import logging
 
 import preprocessing
 
@@ -39,6 +40,7 @@ class TouchDetector(Thread):
                 touches = self.model.predict([
                     image.reshape((1,1,50,50,3)) for image in cropped_images
                 ])
+                logging([int(round(t[0][0][0])) for t in touches])
                 self.sh_touches.set([t[0][0][0] > 0.5 for t in touches])
         print('TOUCH DETECTOR END')
     

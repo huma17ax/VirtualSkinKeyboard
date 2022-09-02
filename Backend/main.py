@@ -1,6 +1,8 @@
 import cv2
 import time
 
+import logger
+
 from marker_detector import detect_marker
 
 from hand_tracker import HandTracker
@@ -44,6 +46,8 @@ try:
         frame = undistort(frame)
         frame = cv2.flip(frame, -1)
 
+        logger.recording(frame)
+
         sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
 
@@ -69,19 +73,4 @@ touches_sender.stop()
 tracker.stop()
 detector.stop()
 
-print("sh_image1: ", end="")
-sh_image1.show_count()
-print("sh_image2: ", end="")
-sh_image2.show_count()
-print("sh_landmarks1: ", end="")
-sh_landmarks1.show_count()
-print("sh_landmarks2: ", end="")
-sh_landmarks2.show_count()
-print("sh_image_and_landmarks: ", end="")
-sh_image_and_landmarks.show_count()
-print("sh_touches: ", end="")
-sh_touches.show_count()
-
-import json
-with open('.\hist.json', 'w') as f:
-    json.dump(SharedData.histories, f)
+logger.output()

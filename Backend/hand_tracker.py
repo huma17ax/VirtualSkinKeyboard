@@ -1,4 +1,5 @@
 from threading import Thread
+from logger import logging
 import mediapipe as mp
 
 import time
@@ -31,6 +32,7 @@ class HandTracker(Thread):
                     results = hands.process(image)
 
                     if not results.multi_hand_landmarks:
+                        logging([])
                         self.sh_landmarks1.set([])
                         self.sh_landmarks2.set([])
                         continue
@@ -38,12 +40,14 @@ class HandTracker(Thread):
                     hand_landmarks = results.multi_hand_landmarks[0].landmark
 
                     self.sh_image_and_landmarks.set((image, hand_landmarks))
-                    self.sh_landmarks1.set([
+                    fingertips = [
                         (hand_landmarks[POS.INDEX_FINGER_TIP].x, hand_landmarks[POS.INDEX_FINGER_TIP].y),
                         (hand_landmarks[POS.MIDDLE_FINGER_TIP].x, hand_landmarks[POS.MIDDLE_FINGER_TIP].y),
                         (hand_landmarks[POS.RING_FINGER_TIP].x, hand_landmarks[POS.RING_FINGER_TIP].y),
                         (hand_landmarks[POS.PINKY_TIP].x, hand_landmarks[POS.PINKY_TIP].y)
-                    ])
+                    ]
+                    logging(fingertips)
+                    self.sh_landmarks1.set(fingertips)
                     self.sh_landmarks2.set([hand_landmarks])
         
         print('HAND TRACKER END.')
