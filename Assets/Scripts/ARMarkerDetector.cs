@@ -19,6 +19,8 @@ public class ARMarkerDetector : MonoBehaviour
     public Vector2 markerPosition = new Vector2(0, 0);
     public Vector2 nextPosition = new Vector2(0, 0);
 
+    private bool log_flag = false;
+
     void Awake()
     {
         this.bg_panel = this.transform.Find("ProjectPlane").gameObject;
@@ -41,6 +43,10 @@ public class ARMarkerDetector : MonoBehaviour
             {
                 this.resetMarkerPosition();
             }
+            if (this.log_flag) {
+                Logger.Logging(new ARMarkerLog(this.markerPosition, this.nextPosition));
+                this.log_flag = false;
+            }
         }
     }
 
@@ -62,6 +68,7 @@ public class ARMarkerDetector : MonoBehaviour
     public void TextureUpdated()
     {
         this.ar_texture.update();
+        this.log_flag = true;
     }
 
     private void calcMarkerPosition()
