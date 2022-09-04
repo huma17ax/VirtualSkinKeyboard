@@ -1,3 +1,4 @@
+from logger import logging
 from namedpipe import NamedPipeClient
 from threading import Thread
 import time
@@ -17,6 +18,7 @@ class LandmarksSender(Thread):
         while not self.stop_flg:
             landmarks = self.sh_landmarks.try_get()
             if landmarks is not None:
+                logging(landmarks)
                 byte_landmarks = b''.join(
                     [struct.pack('<ff', *lm) for lm in landmarks]
                 )

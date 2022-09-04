@@ -1,6 +1,8 @@
 import cv2
 import time
 
+import logger
+
 from marker_detector import detect_marker
 
 from hand_tracker import HandTracker
@@ -18,12 +20,12 @@ capture = cv2.VideoCapture(CAMERA_INDEX)
 
 print(capture.get(cv2.CAP_PROP_FPS))
 
-sh_image1 = SharedData()
-sh_image2 = SharedData()
-sh_landmarks1 = SharedData()
-sh_landmarks2 = SharedData()
-sh_image_and_landmarks = SharedData()
-sh_touches = SharedData()
+sh_image1 = SharedData("image1")
+sh_image2 = SharedData("image2")
+sh_landmarks1 = SharedData("landmarks1")
+sh_landmarks2 = SharedData("landmarks2")
+sh_image_and_landmarks = SharedData("image_and_land")
+sh_touches = SharedData("touches")
 
 image_sender = ImageSender(sh_image1, sh_landmarks2)
 landmarks_sender = LandmarksSender(sh_landmarks1)
@@ -43,6 +45,8 @@ try:
         frame = cv2.flip(frame, -1)
         frame = undistort(frame)
         frame = cv2.flip(frame, -1)
+
+        logger.recording(frame)
 
         sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
@@ -68,3 +72,5 @@ landmarks_sender.stop()
 touches_sender.stop()
 tracker.stop()
 detector.stop()
+
+logger.output()
