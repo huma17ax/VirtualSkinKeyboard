@@ -96,7 +96,11 @@ public class CanvasController : MonoBehaviour
             this.circles[3].GetComponent<RectTransform>().localScale = new Vector3(b[3] ? 2 : 1, b[3] ? 2 : 1 , 1);
 
             for (int i=0; i<4; i++) {
-                if (pre[i]==false && b[i]==true) this.inputs.GetComponent<Text>().text += this.hovered_chars[i];
+                if (pre[i]==false && b[i]==true) 
+                {
+                    this.inputs.GetComponent<Text>().text += this.hovered_chars[i];
+                    Logger.Logging(new TouchedKeyLog(this.hovered_chars[i]));
+                }
                 if (this.inputs.GetComponent<Text>().text.Length > 35) this.inputs.GetComponent<Text>().text.Remove(0,1);
             }
             pre = b;
@@ -172,5 +176,7 @@ public class CanvasController : MonoBehaviour
         this.imageReceiver.Stop();
         this.landmarksReceiver.Stop();
         this.touchReceiver.Stop();
+
+        Logger.Output();
     }
 }
