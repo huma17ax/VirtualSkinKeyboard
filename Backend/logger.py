@@ -6,7 +6,7 @@ import inspect
 import cv2
 import os
 
-file_name = ".\\logs\\logs ({}).csv"
+file_name = ".\\logs\\back_logs ({}).csv"
 logs = []
 video_name = ".\\logs\\record ({}).avi"
 rec = None
