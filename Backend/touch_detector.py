@@ -2,6 +2,7 @@ from threading import Thread
 from keras.models import load_model
 import time
 from logger import logging
+from touch_viewer import add_result
 
 import preprocessing
 
@@ -42,6 +43,7 @@ class TouchDetector(Thread):
                 ])
                 logging([t[0][0][0].item() for t in touches])
                 self.sh_touches.set([t[0][0][0] > 0.5 for t in touches])
+                add_result([t[0][0][0] for t in touches])
         print('TOUCH DETECTOR END')
     
     def stop(self):

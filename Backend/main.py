@@ -13,6 +13,7 @@ from shareddata import SharedData
 from fisheye_undistort import undistort
 from touch_detector import TouchDetector
 from touches_sender import TouchesSender
+from touch_viewer import TouchViewer
 
 CAMERA_INDEX = 0
 
@@ -39,6 +40,8 @@ detector = TouchDetector(sh_image_and_landmarks, sh_touches)
 tracker.start()
 detector.start()
 
+viewer = TouchViewer()
+
 try:
     while True:
         ret, frame = capture.read()
@@ -50,6 +53,8 @@ try:
 
         sh_image1.set(detect_marker(frame))
         sh_image2.set(frame)
+
+        viewer.replot()
 
         time.sleep(0.02)
 
