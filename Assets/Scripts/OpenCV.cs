@@ -4,7 +4,8 @@ using UnityEngine;
 public class OpenCV
 {
 
-    public static Texture2D GrayScale(WebCamTexture texture) {
+    public static Texture2D GrayScale(WebCamTexture texture)
+    {
         Mat src = OpenCvSharp.Unity.TextureToMat(texture);
 
         Mat dst = new Mat();
@@ -14,17 +15,19 @@ public class OpenCV
         return OpenCvSharp.Unity.MatToTexture(dst);
     }
 
-    public static Texture2D Flipped(WebCamTexture texture) {
+    public static Texture2D Flipped(WebCamTexture texture)
+    {
         Mat src = OpenCvSharp.Unity.TextureToMat(texture);
 
         Mat dst = new Mat();
-        
+
         Cv2.Flip(src, dst, FlipMode.XY);
 
         return OpenCvSharp.Unity.MatToTexture(dst);
     }
 
-    public static Texture2D Undistorted(Texture2D texture) {
+    public static Texture2D Undistorted(Texture2D texture)
+    {
         Mat src = OpenCvSharp.Unity.TextureToMat(texture);
 
         Mat dst = new Mat();
@@ -37,7 +40,8 @@ public class OpenCV
         return OpenCvSharp.Unity.MatToTexture(dst);
     }
 
-    public static Texture2D Cropped(Texture2D texture) {
+    public static Texture2D Cropped(Texture2D texture)
+    {
         Mat src = OpenCvSharp.Unity.TextureToMat(texture);
 
         OpenCvSharp.Rect roi = new OpenCvSharp.Rect(
@@ -51,7 +55,7 @@ public class OpenCV
         //     CameraParams.regionOfInterest[3],
         //     CameraParams.regionOfInterest[2],
         //     MatType.CV_8UC3);
-        
+
         // new Mat(src, roi).CopyTo(dst);
 
         Mat dst = new Mat(src, roi);

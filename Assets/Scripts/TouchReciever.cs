@@ -39,7 +39,7 @@ public class TouchReceiver : ThreadRunner
     {
         bool[] booleans = new bool[bytes.Length];
 
-        for (int i=0; i< booleans.Length; i++)
+        for (int i = 0; i < booleans.Length; i++)
         {
             booleans[i] = BitConverter.ToBoolean(bytes, i);
         }

@@ -20,7 +20,8 @@ public class LandmarksReceiver : ThreadRunner
                 try
                 {
                     if (this.token.IsCancellationRequested) break;
-                    if (pipe.status == NamedPipeServer.Status.Connected) {
+                    if (pipe.status == NamedPipeServer.Status.Connected)
+                    {
                         byte[] bytes = pipe.Read(4 * 2 * 4);
                         if (bytes == null) break;
                         this.sh_landmarks.Set(BytesToVectors(bytes));
@@ -38,11 +39,11 @@ public class LandmarksReceiver : ThreadRunner
     {
         Vector2[] vectors = new Vector2[bytes.Length / 8];
 
-        for (int i=0; i < vectors.Length; i++)
+        for (int i = 0; i < vectors.Length; i++)
         {
             vectors[i] = new Vector2(
-                BitConverter.ToSingle(bytes, i*8),
-                BitConverter.ToSingle(bytes, i*8+4));
+                BitConverter.ToSingle(bytes, i * 8),
+                BitConverter.ToSingle(bytes, i * 8 + 4));
         }
 
         return vectors;

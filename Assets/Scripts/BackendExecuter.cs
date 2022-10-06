@@ -10,8 +10,10 @@ public class BackendExecuter : MonoBehaviour
         string exe = System.Environment.GetEnvironmentVariable("ComSpec");
         string file = System.Environment.CurrentDirectory + @"\start_backend.bat";
 
-        this.process = new Process{
-            StartInfo = new ProcessStartInfo(exe){
+        this.process = new Process
+        {
+            StartInfo = new ProcessStartInfo(exe)
+            {
                 UseShellExecute = true,
                 Arguments = "/K " + file
             }
