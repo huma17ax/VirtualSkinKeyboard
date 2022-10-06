@@ -14,7 +14,7 @@ public class NamedPipeServer : IDisposable
         Connected,// 接続完了
         Disposed// 終了
     }
-    public Status status{protected set; get;} = Status.Initial;
+    public Status status { protected set; get; } = Status.Initial;
     private NamedPipeServerStream pipe = null;
     private BinaryWriter writer = null;
     private BinaryReader reader = null;
@@ -67,13 +67,15 @@ public class NamedPipeServer : IDisposable
             await Task.Run(() =>
             {
                 this.pipe.WaitForConnection();
-                if (this.status == Status.Waiting) {
+                if (this.status == Status.Waiting)
+                {
                     Debug.Log("[" + this.pipe_name + "] " + "Pipe connected");
                     this.writer = new BinaryWriter(this.pipe);
                     this.reader = new BinaryReader(this.pipe);
                     this.status = Status.Connected;
                 }
-                else{
+                else
+                {
                     Debug.Log("[" + this.pipe_name + "] " + "No longer waiting");
                 }
             });

@@ -43,7 +43,9 @@ public class ARMarkerDetector : MonoBehaviour
             {
                 this.resetMarkerPosition();
             }
-            if (this.log_flag) {
+            
+            if (this.log_flag)
+            {
                 Logger.Logging(new ARMarkerLog(this.markerPosition, this.nextPosition));
                 this.log_flag = false;
             }

@@ -7,17 +7,20 @@ public class SharedData<T>
 {
     private ConcurrentQueue<T> queue;
 
-    public SharedData(){
+    public SharedData()
+    {
         this.queue = new ConcurrentQueue<T>();
     }
 
-    public void Set(T data){
+    public void Set(T data)
+    {
         T dummy;
         this.queue.TryDequeue(out dummy);
         this.queue.Enqueue(data);
     }
 
-    public bool TryGet(out T result) {
+    public bool TryGet(out T result)
+    {
         return this.queue.TryDequeue(out result);
     }
 }

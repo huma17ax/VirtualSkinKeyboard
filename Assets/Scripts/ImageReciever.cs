@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public class ImageReceiver: ThreadRunner
+public class ImageReceiver : ThreadRunner
 {
     private SharedData<Color32[]> sh_background;
     private SharedData<Color32[]> sh_foreground;
