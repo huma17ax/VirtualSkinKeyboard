@@ -72,7 +72,7 @@ public class CanvasController : MonoBehaviour
             this.detector.TextureUpdated();
         }
         if (this.sh_foreground.TryGet(out this.colors)) {
-            this.foreground.SetPixels32(this.colors);
+            this.foreground.SetPixels32(MultiplyTransparency(0.7f, this.colors));
             this.foreground.Apply();
         }
 
@@ -107,6 +107,14 @@ public class CanvasController : MonoBehaviour
         }
 
         SetKeyboardTransform();
+    }
+
+    private Color32[] MultiplyTransparency(float rate, Color32[] colors) {
+        for (int i = 0; i < colors.Length; i++)
+        {
+            colors[i].a = (byte)(colors[i].a * rate);
+        }
+        return colors;
     }
 
     private void SetKeyboardTransform() {
