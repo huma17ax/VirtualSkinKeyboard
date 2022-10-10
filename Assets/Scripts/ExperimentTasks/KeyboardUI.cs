@@ -25,8 +25,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     void Update()
     {
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
+        Vector2 downward = new Vector2(-axis.y, axis.x);
         float rate = 11f;
-        Vector2 pos = this.detector.markerPosition + axis * rate / 2;
+        Vector2 pos = this.detector.markerPosition + axis * (rate * 21f / 40f) + downward * (rate / 20f);
 
         this.rect_transform.anchoredPosition =
             new Vector3(
