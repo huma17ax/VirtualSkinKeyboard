@@ -16,6 +16,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private ARMarkerDetector detector;
 
+    float timer = 1f;
+    int picked_index = -1;
+
+    Texture2D normal_button_texture;
+    Texture2D picked_button_texture;
+
     void Start()
     {
         this.buttons = new RectTransform[this.keynum];
@@ -29,10 +35,23 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
+
+        this.normal_button_texture = Resources.Load<Texture2D>("Images/box");
+        this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
     }
 
     void Update()
     {
+        if (timer > 0f)
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                timer = 0f;
+                picked_index = Random.Range(0, 4);
+                this.buttons[picked_index].GetComponent<RawImage>().texture = picked_button_texture;
+            }
+        }
 
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
         Vector2 scaled_axis = axis * new Vector2(640, 480) * this.background_transform.localScale;
@@ -67,7 +86,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 if (this.buttons[i].anchoredPosition.x - key_size / 2 < pos.x && pos.x < this.buttons[i].anchoredPosition.x + key_size / 2 &&
                     this.buttons[i].anchoredPosition.y - key_size / 2 < pos.y && pos.y < this.buttons[i].anchoredPosition.y + key_size / 2)
                 {
-
+                    if (i == picked_index)
+                    {
+                        this.buttons[picked_index].GetComponent<RawImage>().texture = normal_button_texture;
+                        picked_index = -1;
+                        timer = 1f;
+                    }
                 }
 
             }
