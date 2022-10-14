@@ -9,7 +9,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private float key_scale = 1f;// キーの大きさ
     private float key_dist = 1.5f;// キーの中心間の距離
-    private int keynum = 5;// キーの数
+    private int keynum = 4;// キーの数
 
     private RectTransform[] buttons;
     private RectTransform background_transform;
@@ -35,24 +35,20 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     {
 
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
-        Vector2 downward = new Vector2(-axis.y, axis.x);
+        Vector2 scaled_axis = axis * new Vector2(640, 480) * this.background_transform.localScale;
+        Vector2 downward = new Vector2(-scaled_axis.y, scaled_axis.x);
 
-        float angle = Mathf.Atan2(-axis.y, -axis.x);
+        Vector2 scaled_marker_position = this.detector.markerPosition * new Vector2(640, 480) * this.background_transform.localScale;
+        float angle = Mathf.Atan2(-scaled_axis.y, -scaled_axis.x);
+
         for (int i = 0; i < keynum; i++)
         {
-            Vector2 pos = this.detector.markerPosition + axis * (i + 2) + downward * 0f;
-            this.buttons[i].anchoredPosition =
-                new Vector3(
-                    pos.x * 640 * this.background_transform.localScale.x,
-                    pos.y * 480 * this.background_transform.localScale.y,
-                    0);
+            Vector2 pos = scaled_marker_position + scaled_axis * (2 + i * this.key_dist) + downward * 0f;
+            this.buttons[i].anchoredPosition = pos;
 
             this.buttons[i].localRotation = Quaternion.Euler(0, 0, 360 * angle / (2 * Mathf.PI));
 
-            float scale = this.key_scale * Vector2.Distance(
-                new Vector2(640 * this.detector.markerPosition.x, 480 * this.detector.markerPosition.y),
-                new Vector2(640 * this.detector.nextPosition.x, 480 * this.detector.nextPosition.y)
-            ) / this.buttons[i].sizeDelta.x;
+            float scale = this.key_scale * scaled_axis.magnitude / this.buttons[i].sizeDelta.x;
             this.buttons[i].localScale = new Vector3(scale, scale, 0);
         }
     }
