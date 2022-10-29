@@ -10,7 +10,7 @@ def hand_mask(image, hand_landmarks):
 
     points_x = []
     points_y = []
-    for mark in hand_landmarks:
+    for mark in hand_landmarks.landmark:
         points_x.append(int(width*mark.x))
         points_y.append(int(height*mark.y))
     

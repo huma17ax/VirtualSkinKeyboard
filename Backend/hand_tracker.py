@@ -37,14 +37,14 @@ class HandTracker(Thread):
                         self.sh_landmarks2.set([])
                         continue
 
-                    hand_landmarks = results.multi_hand_landmarks[0].landmark
+                    hand_landmarks = results.multi_hand_landmarks[0]
 
-                    self.sh_image_and_landmarks.set((image, hand_landmarks))
+                    self.sh_image_and_landmarks.set((image, hand_landmarks.landmark))
                     fingertips = [
-                        (hand_landmarks[POS.INDEX_FINGER_TIP].x, hand_landmarks[POS.INDEX_FINGER_TIP].y),
-                        (hand_landmarks[POS.MIDDLE_FINGER_TIP].x, hand_landmarks[POS.MIDDLE_FINGER_TIP].y),
-                        (hand_landmarks[POS.RING_FINGER_TIP].x, hand_landmarks[POS.RING_FINGER_TIP].y),
-                        (hand_landmarks[POS.PINKY_TIP].x, hand_landmarks[POS.PINKY_TIP].y)
+                        (hand_landmarks.landmark[POS.INDEX_FINGER_TIP].x, hand_landmarks.landmark[POS.INDEX_FINGER_TIP].y),
+                        (hand_landmarks.landmark[POS.MIDDLE_FINGER_TIP].x, hand_landmarks.landmark[POS.MIDDLE_FINGER_TIP].y),
+                        (hand_landmarks.landmark[POS.RING_FINGER_TIP].x, hand_landmarks.landmark[POS.RING_FINGER_TIP].y),
+                        (hand_landmarks.landmark[POS.PINKY_TIP].x, hand_landmarks.landmark[POS.PINKY_TIP].y)
                     ]
                     logging(fingertips)
                     self.sh_landmarks1.set(fingertips)
