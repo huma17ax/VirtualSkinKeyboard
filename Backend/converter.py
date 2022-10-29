@@ -1,4 +1,7 @@
 import numpy as np
+import warnings
+
+warnings.simplefilter('error')
 
 # 標準化
 def normal(data):
