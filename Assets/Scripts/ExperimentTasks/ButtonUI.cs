@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,6 +30,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     TIMER_STATE timer_state = TIMER_STATE.REST;
     float timer = 0.5f;
     int picked_index = -1;
+    public int[] key_pick_order;
+    int key_pick_count = 0;
     Vector2[] fingerPositions;
 
     Texture2D normal_button_texture, picked_button_texture, selected_button_texture;
@@ -49,6 +53,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.normal_button_texture = Resources.Load<Texture2D>("Images/box");
         this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
         this.selected_button_texture = Resources.Load<Texture2D>("Images/selected_box");
+
+        this.key_pick_order = this.GenerateRandomOrder();
     }
 
     void Update()
@@ -64,10 +70,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                     this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.normal_button_texture;
                     this.picked_index = -1;
+                    if (this.key_pick_count == 20) this.timer = 0f;// 終了
                 }
                 else if (this.timer_state == TIMER_STATE.REST) {
                     this.timer = 0f;
-                    this.picked_index = Random.Range(0, 4);
+                    this.picked_index = this.key_pick_order[this.key_pick_count];
+                    this.key_pick_count++;
                     this.timer_state = TIMER_STATE.WAIT;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.picked_button_texture;
                 }
@@ -110,5 +118,23 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 this.buttons[picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
             }
         }
+    }
+
+    int[] index_list = new int[] {0,1,2,3};
+    private int[] GenerateRandomOrder() {
+        List<int> order = new List<int> {};
+
+        for (int i=0; i<5; i++) {
+            if (i==0) {
+                order.AddRange(index_list.OrderBy(e => Guid.NewGuid()));
+            }
+            else {
+                int j = UnityEngine.Random.Range(0,3);
+                order.Add(index_list.Where(e => e!=order.Last()).ToList()[j]);
+                order.AddRange(index_list.Where(e => e!=order.Last()).OrderBy(e => Guid.NewGuid()));
+            }
+        }
+
+        return order.ToArray();
     }
 }
