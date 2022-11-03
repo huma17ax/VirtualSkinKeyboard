@@ -7,8 +7,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 {
     public GameObject buttonPrefab;
 
-    private float key_scale = 1f;// キーの大きさ
-    private float key_dist = 1.5f;// キーの中心間の距離
+    private const float MARKER_SIZE = 23;// 実際のマーカーの大きさ[mm]
+    private const float KEY_SIZE = 15;// キーの大きさ[mm]
+    private const float KEY_DISTANCE = 45;// キーの中心間の距離[mm]
+
+    private float key_scale = KEY_SIZE/MARKER_SIZE;
+    private float key_dist = KEY_DISTANCE/MARKER_SIZE;
     private int keynum = 4;// キーの数
 
     private RectTransform[] buttons;
@@ -16,11 +20,17 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private ARMarkerDetector detector;
 
-    float timer = 1f;
+    enum TIMER_STATE {
+        WAIT, // 押下待ち
+        ACCEPTING, // 長押し中
+        REST, // 次のキー指定まで空ける
+    }
+    TIMER_STATE timer_state = TIMER_STATE.REST;
+    float timer = 0.5f;
     int picked_index = -1;
+    Vector2[] fingerPositions;
 
-    Texture2D normal_button_texture;
-    Texture2D picked_button_texture;
+    Texture2D normal_button_texture, picked_button_texture, selected_button_texture;
 
     void Start()
     {
@@ -38,18 +48,32 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
         this.normal_button_texture = Resources.Load<Texture2D>("Images/box");
         this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
+        this.selected_button_texture = Resources.Load<Texture2D>("Images/selected_box");
     }
 
     void Update()
     {
-        if (timer > 0f)
+        if (this.timer > 0f)
         {
-            timer -= Time.deltaTime;
-            if (timer <= 0f)
+            this.timer -= Time.deltaTime;
+            if (this.timer <= 0f)
             {
-                timer = 0f;
-                picked_index = Random.Range(0, 4);
-                this.buttons[picked_index].GetComponent<RawImage>().texture = picked_button_texture;
+                if (this.timer_state == TIMER_STATE.ACCEPTING) {
+                    this.timer = 0.5f;
+                    this.timer_state = TIMER_STATE.REST;
+                    this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
+                    this.buttons[picked_index].GetComponent<RawImage>().texture = this.normal_button_texture;
+                    this.picked_index = -1;
+                }
+                else if (this.timer_state == TIMER_STATE.REST) {
+                    this.timer = 0f;
+                    this.picked_index = Random.Range(0, 4);
+                    this.timer_state = TIMER_STATE.WAIT;
+                    this.buttons[picked_index].GetComponent<RawImage>().texture = this.picked_button_texture;
+                }
+            }
+            if (this.timer_state == TIMER_STATE.ACCEPTING) {
+                this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.one * (1f - this.timer);
             }
         }
 
@@ -74,33 +98,17 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
-
-        for (int i = 0; i < keynum; i++)
-        {
-
-            foreach (var pos in fingertipAnchoredPositions)
-            {
-
-                float key_size = this.buttons[i].sizeDelta.x * this.buttons[i].localScale.x;
-
-                if (this.buttons[i].anchoredPosition.x - key_size / 2 < pos.x && pos.x < this.buttons[i].anchoredPosition.x + key_size / 2 &&
-                    this.buttons[i].anchoredPosition.y - key_size / 2 < pos.y && pos.y < this.buttons[i].anchoredPosition.y + key_size / 2)
-                {
-                    if (i == picked_index)
-                    {
-                        this.buttons[picked_index].GetComponent<RawImage>().texture = normal_button_texture;
-                        picked_index = -1;
-                        timer = 1f;
-                    }
-                }
-
-            }
-        }
-
+        this.fingerPositions = fingertipAnchoredPositions;
     }
 
     public void Click(int index)
     {
-
+        if (this.timer_state == TIMER_STATE.WAIT) {
+            if (index == this.picked_index) {
+                this.timer = 1f;
+                this.timer_state = TIMER_STATE.ACCEPTING;
+                this.buttons[picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
+            }
+        }
     }
 }
