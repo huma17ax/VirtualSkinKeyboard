@@ -104,7 +104,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     public void Click(int index)
     {
         if (this.timer_state == TIMER_STATE.WAIT) {
-            if (index == this.picked_index) {
+            if (index == 3 - this.picked_index) {
                 this.timer = 1f;
                 this.timer_state = TIMER_STATE.ACCEPTING;
                 this.buttons[picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
