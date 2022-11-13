@@ -25,6 +25,7 @@ class HandTracker(Thread):
             min_tracking_confidence=0.5) as hands:
             
             while not self.stop_flg:
+                logging('HandTrackerLoopLog', None)
                 image = self.sh_image.try_get()
                 if image is None:
                     time.sleep(0.02)
@@ -32,7 +33,7 @@ class HandTracker(Thread):
                     results = hands.process(image)
 
                     if not results.multi_hand_landmarks:
-                        logging([])
+                        logging('HandTrackLog', [])
                         self.sh_landmarks1.set([])
                         self.sh_landmarks2.set([])
                         continue
@@ -46,7 +47,7 @@ class HandTracker(Thread):
                         (hand_landmarks.landmark[POS.RING_FINGER_TIP].x, hand_landmarks.landmark[POS.RING_FINGER_TIP].y),
                         (hand_landmarks.landmark[POS.PINKY_TIP].x, hand_landmarks.landmark[POS.PINKY_TIP].y)
                     ]
-                    logging(fingertips)
+                    logging('HandTrackLog', fingertips)
                     self.sh_landmarks1.set(fingertips)
                     self.sh_landmarks2.set([hand_landmarks])
         

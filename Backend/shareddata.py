@@ -15,9 +15,9 @@ class SharedData():
     def set(self, data):
         try:
             self.queue.get(block=False)
-            logging({"name": self.name, "message": "set(update)"})
+            logging('SharedDataLog', {"name": self.name, "message": "set(update)"})
         except queue.Empty:
-            logging({"name": self.name, "message": "set"})
+            logging('SharedDataLog', {"name": self.name, "message": "set"})
         self.queue.put(data)
 
     def get(self, timeout=None):
@@ -26,8 +26,8 @@ class SharedData():
     def try_get(self):
         try:
             data = self.queue.get(block=False)
-            logging({"name": self.name, "message": "get"})
+            logging('SharedDataLog', {"name": self.name, "message": "get"})
             return data
         except queue.Empty:
-            logging({"name": self.name, "message": "get(failed)"})
+            logging('SharedDataLog', {"name": self.name, "message": "get(failed)"})
             return None
