@@ -96,7 +96,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
         for (int i = 0; i < keynum; i++)
         {
-            Vector2 pos = scaled_marker_position + scaled_axis * (2 + i * this.key_dist) + downward * 0f;
+            Vector2 pos = scaled_marker_position + scaled_axis * (2 + (3 - i) * this.key_dist) + downward * 0f;
             this.buttons[i].anchoredPosition = pos;
 
             this.buttons[i].localRotation = Quaternion.Euler(0, 0, 360 * angle / (2 * Mathf.PI));
@@ -118,12 +118,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         Logger.Logging(
             new TouchToButtonLog(
                 index,
-                (index == 3 - this.picked_index),
+                (index == this.picked_index),
                 this.fingerPositions[index]
             )
         );
         if (this.timer_state == TIMER_STATE.WAIT) {
-            if (index == 3 - this.picked_index) {
+            if (index == this.picked_index) {
                 this.timer = 1f;
                 this.timer_state = TIMER_STATE.ACCEPTING;
                 this.buttons[this.picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
