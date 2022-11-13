@@ -30,7 +30,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     TIMER_STATE timer_state = TIMER_STATE.REST;
     float timer = 0.5f;
     int picked_index = -1;
-    public int[] key_pick_order;
+    int[] key_pick_order;
     int key_pick_count = 0;
     Vector2[] fingerPositions;
 
@@ -65,6 +65,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             if (this.timer <= 0f)
             {
                 if (this.timer_state == TIMER_STATE.ACCEPTING) {
+                    Logger.Logging(new TimerStateLog("REST", this.picked_index));
                     this.timer = 0.5f;
                     this.timer_state = TIMER_STATE.REST;
                     this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
@@ -78,6 +79,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                     this.key_pick_count++;
                     this.timer_state = TIMER_STATE.WAIT;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.picked_button_texture;
+                    Logger.Logging(new TimerStateLog("WAIT", this.picked_index));
                 }
             }
             if (this.timer_state == TIMER_STATE.ACCEPTING) {
@@ -101,6 +103,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
             float scale = this.key_scale * scaled_axis.magnitude / this.buttons[i].sizeDelta.x;
             this.buttons[i].localScale = new Vector3(scale, scale, 0);
+
+            Logger.Logging(new ButtonLog(pos, angle, scale * this.buttons[i].sizeDelta.x, KEY_SIZE, i));
         }
     }
 
@@ -111,11 +115,19 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     public void Click(int index)
     {
+        Logger.Logging(
+            new TouchToButtonLog(
+                index,
+                (index == 3 - this.picked_index),
+                this.fingerPositions[index]
+            )
+        );
         if (this.timer_state == TIMER_STATE.WAIT) {
             if (index == 3 - this.picked_index) {
                 this.timer = 1f;
                 this.timer_state = TIMER_STATE.ACCEPTING;
-                this.buttons[picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
+                this.buttons[this.picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
+                Logger.Logging(new TimerStateLog("ACC", this.picked_index));
             }
         }
     }
