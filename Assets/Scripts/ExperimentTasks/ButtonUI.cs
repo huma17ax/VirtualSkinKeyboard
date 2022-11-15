@@ -10,10 +10,10 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     public GameObject buttonPrefab;
 
     private const float MARKER_SIZE = 23;// 実際のマーカーの大きさ[mm]
-    private const float KEY_SIZE = 15;// キーの大きさ[mm]
+    public float[] KEY_SIZE = {15};// キーの大きさ[mm]
     private const float KEY_DISTANCE = 45;// キーの中心間の距離[mm]
 
-    private float key_scale = KEY_SIZE/MARKER_SIZE;
+    private float key_scale;
     private float key_dist = KEY_DISTANCE/MARKER_SIZE;
     private int keynum = 4;// キーの数
 
@@ -32,6 +32,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     int picked_index = -1;
     int[] key_pick_order;
     int key_pick_count = 0;
+    int key_size_step = 0;
     Vector2[] fingerPositions;
 
     Texture2D normal_button_texture, picked_button_texture, selected_button_texture;
@@ -54,7 +55,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
         this.selected_button_texture = Resources.Load<Texture2D>("Images/selected_box");
 
-        this.key_pick_order = this.GenerateRandomOrder();
+        this.InitStep();
     }
 
     void Update()
@@ -71,7 +72,15 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                     this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.normal_button_texture;
                     this.picked_index = -1;
-                    if (this.key_pick_count == 20) this.timer = 0f;// 終了
+                    if (this.key_pick_count == 20) {
+                        if (this.key_size_step == this.KEY_SIZE.Length-1) {
+                            this.timer = 0f;// 終了
+                        }
+                        else {
+                            this.key_size_step++;
+                            this.InitStep();
+                        }
+                    }
                 }
                 else if (this.timer_state == TIMER_STATE.REST) {
                     this.timer = 0f;
@@ -104,7 +113,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             float scale = this.key_scale * scaled_axis.magnitude / this.buttons[i].sizeDelta.x;
             this.buttons[i].localScale = new Vector3(scale, scale, 0);
 
-            Logger.Logging(new ButtonLog(pos, angle, scale * this.buttons[i].sizeDelta.x, KEY_SIZE, i));
+            Logger.Logging(new ButtonLog(pos, angle, scale * this.buttons[i].sizeDelta.x, this.KEY_SIZE[this.key_size_step], i));
         }
     }
 
@@ -130,6 +139,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 Logger.Logging(new TimerStateLog("ACC", this.picked_index));
             }
         }
+    }
+
+    private void InitStep() {
+        this.key_scale = this.KEY_SIZE[this.key_size_step]/MARKER_SIZE;
+        this.key_pick_order = this.GenerateRandomOrder();
+        this.key_pick_count = 0;
     }
 
     int[] index_list = new int[] {0,1,2,3};
