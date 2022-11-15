@@ -18,7 +18,7 @@ class LandmarksSender(Thread):
         while not self.stop_flg:
             landmarks = self.sh_landmarks.try_get()
             if landmarks is not None:
-                logging(landmarks)
+                logging('LandmarksSendingLog', landmarks)
                 byte_landmarks = b''.join(
                     [struct.pack('<ff', *lm) for lm in landmarks]
                 )

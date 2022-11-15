@@ -6,6 +6,9 @@ import inspect
 import cv2
 import os
 
+# ログ残す処理
+# <日時(ミリ秒まで)>, <Front/Back>, <ログ種別(クラス)>, <呼び出し元情報>, <実データ>
+
 file_name = ".\\logs\\back_logs ({}).csv"
 logs = []
 video_name = ".\\logs\\record ({}).avi"
@@ -21,14 +24,14 @@ def output():
     if rec is not None:
         rec.release()
 
-def logging(data):
+def logging(title, data):
     time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S:%f")
     caller = inspect.stack()[1]
     if "self" in caller.frame.f_locals:
         src_name = caller.frame.f_locals["self"].__class__.__name__
     else:
         src_name = os.path.splitext(os.path.basename(caller.filename))[0] + '/' + caller.function
-    logs.append([time, src_name, json.dumps(data)])
+    logs.append([time, "Back", title, src_name, json.dumps(data)])
 
 def recording(_frame):
     global rec, frame_count
@@ -37,6 +40,6 @@ def recording(_frame):
     if rec is None:
         rec = cv2.VideoWriter(video_name.format(datestr), 1145656920, 30, (width, height), True)
     cv2.putText(frame, str(frame_count), (0, height-15), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 1)
-    logging({"frame": frame_count})
+    logging('VideoRecordingLog', {"frame": frame_count})
     rec.write(frame)
     frame_count += 1

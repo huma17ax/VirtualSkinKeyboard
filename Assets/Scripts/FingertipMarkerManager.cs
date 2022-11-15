@@ -26,6 +26,7 @@ public class FingertipMarkerManager : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             GameObject obj = Instantiate(markerPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), this.transform);
+            obj.SetActive(false);// マーカー非表示
             markerRectTransforms[i] = obj.GetComponent<RectTransform>();
             markerRectTransforms[i].localPosition = Vector3.zero;
         }

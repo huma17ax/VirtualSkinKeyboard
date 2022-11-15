@@ -19,7 +19,7 @@ class TouchesSender(Thread):
         while not self.stop_flg:
             touches = self.sh_touches.try_get()
             if touches is not None:
-                logging([1 if t else 0 for t in touches])
+                logging('TouchSendingLog', [1 if t else 0 for t in touches])
                 byte_touches = struct.pack('<????', *touches)
                 self.pipe.write(byte_touches)
             time.sleep(0.02)

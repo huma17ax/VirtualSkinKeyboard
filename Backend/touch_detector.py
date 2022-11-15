@@ -28,6 +28,7 @@ class TouchDetector(Thread):
         # In thread
         print('TOUCH DETECTOR START')
         while not self.stop_flg:
+            logging('TouchDetectorLoopLog', None)
             image_and_landmarks = self.sh_image_and_landmarks.try_get()
             if image_and_landmarks is None:
                 time.sleep(0.02)
@@ -36,12 +37,13 @@ class TouchDetector(Thread):
                 cropped_images = preprocessing.crop(image, landmarks)
 
                 if cropped_images is None:
+                    logging('TouchDetectLog', None)
                     continue
 
                 touches = self.model.predict([
                     image.reshape((1,1,50,50,3)) for image in cropped_images
                 ])
-                logging([t[0][0][0].item() for t in touches])
+                logging('TouchDetectLog', [t[0][0][0].item() for t in touches])
                 self.sh_touches.set([t[0][0][0] > 0.5 for t in touches])
                 add_result([t[0][0][0] for t in touches])
         print('TOUCH DETECTOR END')
