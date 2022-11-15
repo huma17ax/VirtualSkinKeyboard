@@ -109,7 +109,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             Vector2 pos = scaled_marker_position + scaled_axis * (2 + (KEY_NUM-1 - i) * this.key_dist) + downward * 0f;
             this.buttons[i].anchoredPosition = pos;
 
-            this.buttons[i].localRotation = Quaternion.Euler(0, 0, 360 * angle / (2 * Mathf.PI));
+            this.buttons[i].localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
 
             float scale = this.key_scale * scaled_axis.magnitude / this.buttons[i].sizeDelta.x;
             this.buttons[i].localScale = new Vector3(scale, scale, 0);
