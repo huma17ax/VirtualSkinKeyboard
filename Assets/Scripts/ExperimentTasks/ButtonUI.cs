@@ -15,7 +15,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private float key_scale;
     private float key_dist = KEY_DISTANCE/MARKER_SIZE;
-    private int keynum = 4;// キーの数
+    private const int KEY_NUM = 4;// キーの数
+    private const int COUNT_PER_STEP = 5;// 1ステップ(キーサイズ)ごとの試行数
 
     private RectTransform[] buttons;
     private RectTransform background_transform;
@@ -39,9 +40,9 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     void Start()
     {
-        this.buttons = new RectTransform[this.keynum];
+        this.buttons = new RectTransform[KEY_NUM];
 
-        for (int i = 0; i < this.keynum; i++)
+        for (int i = 0; i < KEY_NUM; i++)
         {
             GameObject obj = Instantiate(this.buttonPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform);
             this.buttons[i] = obj.GetComponent<RectTransform>();
@@ -72,7 +73,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                     this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.normal_button_texture;
                     this.picked_index = -1;
-                    if (this.key_pick_count == 20) {
+                    if (this.key_pick_count == KEY_NUM*COUNT_PER_STEP) {
                         if (this.key_size_step == this.KEY_SIZE.Length-1) {
                             this.timer = 0f;// 終了
                         }
@@ -103,9 +104,9 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         Vector2 scaled_marker_position = this.detector.markerPosition * new Vector2(640, 480) * this.background_transform.localScale;
         float angle = Mathf.Atan2(-scaled_axis.y, -scaled_axis.x);
 
-        for (int i = 0; i < keynum; i++)
+        for (int i = 0; i < KEY_NUM; i++)
         {
-            Vector2 pos = scaled_marker_position + scaled_axis * (2 + (3 - i) * this.key_dist) + downward * 0f;
+            Vector2 pos = scaled_marker_position + scaled_axis * (2 + (KEY_NUM-1 - i) * this.key_dist) + downward * 0f;
             this.buttons[i].anchoredPosition = pos;
 
             this.buttons[i].localRotation = Quaternion.Euler(0, 0, 360 * angle / (2 * Mathf.PI));
@@ -147,11 +148,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.key_pick_count = 0;
     }
 
-    int[] index_list = new int[] {0,1,2,3};
     private int[] GenerateRandomOrder() {
-        List<int> order = new List<int> {};
+        int [] index_list = new int[KEY_NUM];
+        for (int i=0; i < KEY_NUM; i++) index_list[i] = i;
 
-        for (int i=0; i<5; i++) {
+        List<int> order = new List<int> {};
+        for (int i=0; i<COUNT_PER_STEP; i++) {
             if (i==0) {
                 order.AddRange(index_list.OrderBy(e => Guid.NewGuid()));
             }
