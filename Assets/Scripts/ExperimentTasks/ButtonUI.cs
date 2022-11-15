@@ -10,11 +10,11 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     public GameObject buttonPrefab;
 
     private const float MARKER_SIZE = 23;// 実際のマーカーの大きさ[mm]
-    public float[] KEY_SIZE = {15};// キーの大きさ[mm]
+    public float[] KEY_SIZE = { 15 };// キーの大きさ[mm]
     private const float KEY_DISTANCE = 45;// キーの中心間の距離[mm]
 
     private float key_scale;
-    private float key_dist = KEY_DISTANCE/MARKER_SIZE;
+    private float key_dist = KEY_DISTANCE / MARKER_SIZE;
     private const int KEY_NUM = 4;// キーの数
     private const int COUNT_PER_STEP = 5;// 1ステップ(キーサイズ)ごとの試行数
 
@@ -23,7 +23,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private ARMarkerDetector detector;
 
-    enum TIMER_STATE {
+    enum TIMER_STATE
+    {
         WAIT, // 押下待ち
         ACCEPTING, // 長押し中
         REST, // 次のキー指定まで空ける
@@ -66,24 +67,29 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             this.timer -= Time.deltaTime;
             if (this.timer <= 0f)
             {
-                if (this.timer_state == TIMER_STATE.ACCEPTING) {
+                if (this.timer_state == TIMER_STATE.ACCEPTING)
+                {
                     Logger.Logging(new TimerStateLog("REST", this.picked_index));
                     this.timer = 0.5f;
                     this.timer_state = TIMER_STATE.REST;
                     this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.zero;
                     this.buttons[picked_index].GetComponent<RawImage>().texture = this.normal_button_texture;
                     this.picked_index = -1;
-                    if (this.key_pick_count == KEY_NUM*COUNT_PER_STEP) {
-                        if (this.key_size_step == this.KEY_SIZE.Length-1) {
+                    if (this.key_pick_count == KEY_NUM * COUNT_PER_STEP)
+                    {
+                        if (this.key_size_step == this.KEY_SIZE.Length - 1)
+                        {
                             this.timer = 0f;// 終了
                         }
-                        else {
+                        else
+                        {
                             this.key_size_step++;
                             this.InitStep();
                         }
                     }
                 }
-                else if (this.timer_state == TIMER_STATE.REST) {
+                else if (this.timer_state == TIMER_STATE.REST)
+                {
                     this.timer = 0f;
                     this.picked_index = this.key_pick_order[this.key_pick_count];
                     this.key_pick_count++;
@@ -92,7 +98,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                     Logger.Logging(new TimerStateLog("WAIT", this.picked_index));
                 }
             }
-            if (this.timer_state == TIMER_STATE.ACCEPTING) {
+            if (this.timer_state == TIMER_STATE.ACCEPTING)
+            {
                 this.buttons[picked_index].Find("Fill").GetComponent<RectTransform>().localScale = Vector3.one * (1f - this.timer);
             }
         }
@@ -106,7 +113,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
         for (int i = 0; i < KEY_NUM; i++)
         {
-            Vector2 pos = scaled_marker_position + scaled_axis * (2 + (KEY_NUM-1 - i) * this.key_dist) + downward * 0f;
+            Vector2 pos = scaled_marker_position + scaled_axis * (2 + (KEY_NUM - 1 - i) * this.key_dist) + downward * 0f;
             this.buttons[i].anchoredPosition = pos;
 
             this.buttons[i].localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -132,8 +139,10 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 this.fingerPositions[index]
             )
         );
-        if (this.timer_state == TIMER_STATE.WAIT) {
-            if (index == this.picked_index) {
+        if (this.timer_state == TIMER_STATE.WAIT)
+        {
+            if (index == this.picked_index)
+            {
                 this.timer = 1f;
                 this.timer_state = TIMER_STATE.ACCEPTING;
                 this.buttons[this.picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
@@ -142,25 +151,30 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         }
     }
 
-    private void InitStep() {
-        this.key_scale = this.KEY_SIZE[this.key_size_step]/MARKER_SIZE;
+    private void InitStep()
+    {
+        this.key_scale = this.KEY_SIZE[this.key_size_step] / MARKER_SIZE;
         this.key_pick_order = this.GenerateRandomOrder();
         this.key_pick_count = 0;
     }
 
-    private int[] GenerateRandomOrder() {
-        int [] index_list = new int[KEY_NUM];
-        for (int i=0; i < KEY_NUM; i++) index_list[i] = i;
+    private int[] GenerateRandomOrder()
+    {
+        int[] index_list = new int[KEY_NUM];
+        for (int i = 0; i < KEY_NUM; i++) index_list[i] = i;
 
-        List<int> order = new List<int> {};
-        for (int i=0; i<COUNT_PER_STEP; i++) {
-            if (i==0) {
+        List<int> order = new List<int> { };
+        for (int i = 0; i < COUNT_PER_STEP; i++)
+        {
+            if (i == 0)
+            {
                 order.AddRange(index_list.OrderBy(e => Guid.NewGuid()));
             }
-            else {
-                int j = UnityEngine.Random.Range(0,3);
-                order.Add(index_list.Where(e => e!=order.Last()).ToList()[j]);
-                order.AddRange(index_list.Where(e => e!=order.Last()).OrderBy(e => Guid.NewGuid()));
+            else
+            {
+                int j = UnityEngine.Random.Range(0, 3);
+                order.Add(index_list.Where(e => e != order.Last()).ToList()[j]);
+                order.AddRange(index_list.Where(e => e != order.Last()).OrderBy(e => Guid.NewGuid()));
             }
         }
 

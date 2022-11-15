@@ -13,9 +13,9 @@ public class CanvasController : MonoBehaviour
     private Texture2D background;
     private Texture2D foreground;
     private Color32[] colors;
-    
+
     private ARMarkerDetector detector;
-    
+
     void Start()
     {
         this.rawImage = GetComponent<RawImage>();
