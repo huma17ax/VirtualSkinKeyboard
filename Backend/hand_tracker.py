@@ -38,7 +38,7 @@ class HandTracker(Thread):
                         self.sh_landmarks2.set([])
                         continue
 
-                    hand_landmarks = results.multi_hand_landmarks[0]
+                    hand_landmarks = self.select_center_hand(results.multi_hand_landmarks)
 
                     self.sh_image_and_landmarks.set((image, hand_landmarks.landmark))
                     fingertips = [
@@ -55,3 +55,17 @@ class HandTracker(Thread):
     
     def stop(self):
         self.stop_flg = True
+    
+    def select_center_hand(self, multi_hands):
+        selected_hand = None
+        min_dist = 10
+        for hand in multi_hands:
+            hand_center = [0, 0]
+            for pos in [POS.WRIST, POS.THUMB_CMC, POS.INDEX_FINGER_MCP, POS.PINKY_MCP]:
+                hand_center[0] += hand.landmark[pos].x / 4
+                hand_center[1] += hand.landmark[pos].y / 4
+            dist_from_center = pow(hand_center[0]-0.5, 2) + pow(hand_center[1]-0.5, 2)
+            if dist_from_center < min_dist:
+                selected_hand = hand
+                min_dist = dist_from_center
+        return selected_hand
