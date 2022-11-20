@@ -23,6 +23,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     private ARMarkerDetector detector;
 
+    public bool check_to_start = false;
+
     enum TIMER_STATE
     {
         WAIT, // 押下待ち
@@ -30,7 +32,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         REST, // 次のキー指定まで空ける
     }
     TIMER_STATE timer_state = TIMER_STATE.REST;
-    float timer = 0.5f;
+    float timer = 0f;
     int picked_index = -1;
     int[] key_pick_order;
     int key_pick_count = 0;
@@ -62,6 +64,12 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     void Update()
     {
+        if (this.check_to_start) {
+            this.check_to_start = false;
+            this.timer = 0.5f;
+            this.timer_state = TIMER_STATE.REST;
+        }
+
         if (this.timer > 0f)
         {
             this.timer -= Time.deltaTime;
