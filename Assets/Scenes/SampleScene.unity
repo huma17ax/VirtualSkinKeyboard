@@ -588,6 +588,7 @@ MonoBehaviour:
   buttonPrefab: {fileID: 7132966190713432418, guid: 3c7ccff6c813c9540b359909867ddbcb, type: 3}
   KEY_SIZE:
   - 15
+  check_to_start: 0
 --- !u!1001 &1386692032
 PrefabInstance:
   m_ObjectHideFlags: 0
