@@ -13,6 +13,10 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private Text input_text;
 
+    private string inputted_chars = "";
+    private string incorrect_chars = "";
+    private string required_chars = "ABCDEFGHIJ";
+
     void Start()
     {
         this.rect_transform = this.GetComponent<RectTransform>();
@@ -94,5 +98,37 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.input_text.text += this.hovered_chars[index];
         Logger.Logging(new TouchedKeyLog(this.hovered_chars[index]));
         if (this.input_text.text.Length > 35) this.input_text.text.Remove(0, 1);
+    }
+
+    private void InputChar(char c)
+    {
+        if (this.incorrect_chars.Length > 0)
+        {
+            this.incorrect_chars += c;
+        }
+        else if (this.required_chars.Length > 0 && this.required_chars[0] == c)
+        {
+            this.inputted_chars += this.required_chars[0];
+            this.required_chars = this.required_chars.Remove(0, 1);
+        }
+        else
+        {
+            this.incorrect_chars += c;
+        }
+        this.input_text.text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
+    }
+
+    private void DeleteChar()
+    {
+        if (this.incorrect_chars.Length > 0)
+        {
+            this.incorrect_chars = this.incorrect_chars.Remove(this.incorrect_chars.Length - 1);
+        }
+        else if (this.inputted_chars.Length > 0)
+        {
+            this.required_chars = this.inputted_chars[this.inputted_chars.Length - 1] + this.required_chars;
+            this.inputted_chars = this.inputted_chars.Remove(this.inputted_chars.Length - 1);
+        }
+        this.input_text.text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
 }
