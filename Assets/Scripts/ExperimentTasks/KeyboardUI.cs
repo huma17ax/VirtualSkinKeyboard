@@ -19,7 +19,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
-        this.input_text = GameObject.Find("Canvas/Inputs").GetComponent<Text>();
+        this.input_text = this.rect_transform.Find("InputTexts").GetComponent<Text>();
     }
 
     void Update()
