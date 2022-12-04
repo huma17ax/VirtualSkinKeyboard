@@ -11,6 +11,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private const float KEY_SIZE = 15;// キーの一辺の大きさ[mm]
     private const float KEY_DISTANCE = 15;// キーの中心間の距離[mm]
     private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからの距離[mm]
+    private const int FONT_SIZE = 80;// キーに表示される文字の大きさ
 
     private RectTransform rect_transform;
     private ARMarkerDetector detector;
@@ -41,6 +42,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             GameObject obj = Instantiate(this.keyPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform);
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;
+            Text key_char = rt.Find("Char").GetComponent<Text>();
+            key_char.text = "" + (char)('A'+i);
+            key_char.fontSize = FONT_SIZE;
             this.keys.Add((char)('A' + i), rt);
         }
     }
