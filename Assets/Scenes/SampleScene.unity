@@ -700,8 +700,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1631010906}
-  - component: {fileID: 1631010908}
-  - component: {fileID: 1631010907}
   - component: {fileID: 1631010909}
   m_Layer: 5
   m_Name: Keyboard
@@ -719,7 +717,7 @@ RectTransform:
   m_GameObject: {fileID: 1631010905}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1906150357}
   m_Father: {fileID: 681079594}
@@ -728,43 +726,8 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1011, y: 311}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1631010907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631010905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Texture: {fileID: 2800000, guid: c92361ed9df07894e8c82948b31dddd7, type: 3}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
---- !u!222 &1631010908
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631010905}
-  m_CullTransparentMesh: 1
 --- !u!114 &1631010909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -777,6 +740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cff00f6233b10f42959e7002757a0c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyPrefab: {fileID: 2911979691747746087, guid: 91ba09d327e99504491d5525e430a7fd, type: 3}
 --- !u!1 &1884118438
 GameObject:
   m_ObjectHideFlags: 0

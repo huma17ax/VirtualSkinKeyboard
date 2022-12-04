@@ -5,9 +5,18 @@ using UnityEngine.UI;
 
 public class KeyboardUI : MonoBehaviour, IExperimentUI
 {
+    public GameObject keyPrefab;
+
+    private const float MARKER_SIZE = 24;// 実際のマーカーの大きさ[mm]
+    private const float KEY_SIZE = 15;// キーの一辺の大きさ[mm]
+    private const float KEY_DISTANCE = 15;// キーの中心間の距離[mm]
+    private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからの距離[mm]
+
     private RectTransform rect_transform;
     private ARMarkerDetector detector;
     private RectTransform background_transform;
+
+    private Dictionary<char, RectTransform> keys = new Dictionary<char, RectTransform>();
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
 
@@ -17,6 +26,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private string incorrect_chars = "";
     private string required_chars = "ABCDEFGHIJ";
 
+    private static readonly string[] keys_array = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
+
     void Start()
     {
         this.rect_transform = this.GetComponent<RectTransform>();
@@ -24,73 +35,48 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         this.input_text = this.rect_transform.Find("InputTexts").GetComponent<Text>();
+
+        for (int i = 0; i < 26; i++)
+        {
+            GameObject obj = Instantiate(this.keyPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform);
+            RectTransform rt = obj.GetComponent<RectTransform>();
+            rt.localPosition = Vector3.zero;
+            this.keys.Add((char)('A' + i), rt);
+        }
     }
 
     void Update()
     {
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
-        Vector2 downward = new Vector2(-axis.y, axis.x);
-        float rate = 11f;
-        Vector2 pos = this.detector.markerPosition + axis * (rate * 21f / 40f) + downward * (rate / 20f);
+        Vector2 scaled_axis = axis * new Vector2(640, 480) * this.background_transform.localScale;
+        Vector2 downward = new Vector2(-scaled_axis.y, scaled_axis.x);
 
-        this.rect_transform.anchoredPosition =
-            new Vector3(
-                pos.x * 640 * this.background_transform.localScale.x,
-                pos.y * 480 * this.background_transform.localScale.y,
-                0);
+        Vector2 scaled_marker_position = this.detector.markerPosition * new Vector2(640, 480) * this.background_transform.localScale;
+        float angle = Mathf.Atan2(-scaled_axis.y, -scaled_axis.x);
 
-        float angle = Mathf.Atan2(-axis.y, -axis.x);
-        this.rect_transform.localRotation = Quaternion.Euler(0, 0, 360 * angle / (2 * Mathf.PI));
+        for (int i = 0; i < keys_array.Length; i++)
+        {
+            string keys_row = keys_array[i];
+            float offset_y = (i - 1) * KEY_DISTANCE / MARKER_SIZE;
+            float offset_x = -0.5f * i * KEY_DISTANCE / MARKER_SIZE;
 
-        float scale = rate * Vector2.Distance(
-            new Vector2(640 * this.detector.markerPosition.x, 480 * this.detector.markerPosition.y),
-            new Vector2(640 * this.detector.nextPosition.x, 480 * this.detector.nextPosition.y)
-        ) / this.rect_transform.sizeDelta.x;
-        this.rect_transform.localScale = new Vector3(scale, scale, 0);
+            for (int j = 0; j < keys_row.Length; j++)
+            {
+                char target_char = keys_row[j];
+                Vector2 pos = scaled_marker_position + scaled_axis * ((10 - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
+                this.keys[target_char].anchoredPosition = pos;
+
+                this.keys[target_char].localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+
+                float scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.keys[target_char].sizeDelta.x;
+                this.keys[target_char].localScale = new Vector3(scale, scale, 0);
+            }
+        }
+
     }
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
-        const string top_keys = "QWERTYUIOP";
-        const string mid_keys = "ASDFGHJKL";
-        const string bottom_keys = "ZXCVBNM";
-
-        for (int i = 0; i < 4; i++)
-        {
-            float angle = Mathf.Atan2(
-                fingertipAnchoredPositions[i].y - this.rect_transform.anchoredPosition.y,
-                fingertipAnchoredPositions[i].x - this.rect_transform.anchoredPosition.x
-            ) / (2 * Mathf.PI) * 360;
-            float dist = Vector2.Distance(this.rect_transform.anchoredPosition, fingertipAnchoredPositions[i]);
-            Vector2 normalized_position =
-                new Vector2(
-                    dist * Mathf.Cos((angle - this.rect_transform.localRotation.eulerAngles.z) / 360 * (2 * Mathf.PI)),
-                    dist * Mathf.Sin((angle - this.rect_transform.localRotation.eulerAngles.z) / 360 * (2 * Mathf.PI))
-                ) / (this.rect_transform.sizeDelta * this.rect_transform.localScale) + new Vector2(0.5f, 0.5f);
-
-            if (normalized_position.y < 1f / 3f)
-            {
-                // bottom row
-                int x = (int)Mathf.Floor(normalized_position.x * 10f - 1f);
-                if (x < 0 || x > 6) this.hovered_chars[i] = ' ';
-                else this.hovered_chars[i] = bottom_keys[x];
-            }
-            else if (normalized_position.y < 2f / 3f)
-            {
-                // middle row
-                int x = (int)Mathf.Floor(normalized_position.x * 10f - 0.5f);
-                if (x < 0 || x > 8) this.hovered_chars[i] = ' ';
-                else this.hovered_chars[i] = mid_keys[x];
-            }
-            else
-            {
-                // top row
-                int x = (int)Mathf.Floor(normalized_position.x * 10f);
-                if (x < 0 || x > 9) this.hovered_chars[i] = ' ';
-                else this.hovered_chars[i] = top_keys[x];
-            }
-
-        }
     }
 
     public void Click(int index)
