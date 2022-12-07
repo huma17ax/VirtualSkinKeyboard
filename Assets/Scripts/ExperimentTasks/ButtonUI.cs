@@ -24,6 +24,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
     private ARMarkerDetector detector;
 
     public bool check_to_start = false;
+    public bool skip = false;
 
     enum TIMER_STATE
     {
@@ -68,6 +69,14 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             this.check_to_start = false;
             this.timer = 0.5f;
             this.timer_state = TIMER_STATE.REST;
+        }
+
+        if (this.skip) {
+            this.skip = false;
+            this.timer = 1f;
+            this.timer_state = TIMER_STATE.ACCEPTING;
+            this.buttons[this.picked_index].GetComponent<RawImage>().texture = this.selected_button_texture;
+            Logger.Logging(new TimerStateLog("ACC_SKIP", this.picked_index));
         }
 
         if (this.timer > 0f)
