@@ -64,8 +64,9 @@ class HandTracker(Thread):
             for pos in [POS.WRIST, POS.THUMB_CMC, POS.INDEX_FINGER_MCP, POS.PINKY_MCP]:
                 hand_center[0] += hand.landmark[pos].x / 4
                 hand_center[1] += hand.landmark[pos].y / 4
-            dist_from_center = pow(hand_center[0]-0.5, 2) + pow(hand_center[1]-0.5, 2)
-            if dist_from_center < min_dist:
+            # dist_from_center = pow(hand_center[0]-0.5, 2) + pow(hand_center[1]-0.5, 2)
+            dist_from_left = hand_center[0]
+            if dist_from_left < min_dist:
                 selected_hand = hand
-                min_dist = dist_from_center
+                min_dist = dist_from_left
         return selected_hand

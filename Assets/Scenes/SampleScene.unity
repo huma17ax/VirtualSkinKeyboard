@@ -588,6 +588,7 @@ MonoBehaviour:
   KEY_SIZE:
   - 15
   check_to_start: 0
+  skip: 0
 --- !u!1001 &1386692032
 PrefabInstance:
   m_ObjectHideFlags: 0
