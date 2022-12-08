@@ -56,9 +56,9 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
 
-        this.normal_button_texture = Resources.Load<Texture2D>("Images/box");
-        this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
-        this.selected_button_texture = Resources.Load<Texture2D>("Images/selected_box");
+        this.normal_button_texture = Resources.Load<Texture2D>("Images/black_box");
+        this.picked_button_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.selected_button_texture = Resources.Load<Texture2D>("Images/green_box");
 
         this.InitStep();
     }

@@ -32,7 +32,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
 
-    private RectTransform input_text;
+    private RectTransform phrase;
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
@@ -48,7 +48,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
-        this.input_text = this.rect_transform.Find("InputTexts").GetComponent<RectTransform>();
+        this.phrase = this.rect_transform.Find("Phrase").GetComponent<RectTransform>();
 
         for (int i = 0; i < 26; i++)
         {
@@ -61,10 +61,10 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             this.keys.Add((char)('A' + i), new KeyState(rt));
         }
 
-        this.normal_key_texture = Resources.Load<Texture2D>("Images/box");
-        this.touched_key_texture = Resources.Load<Texture2D>("Images/picked_box");
+        this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
+        this.touched_key_texture = Resources.Load<Texture2D>("Images/red_box");
 
-        this.input_text.GetComponent<Text>().text = this.required_chars;
+        this.phrase.GetComponent<Text>().text = this.required_chars;
     }
 
     void Update()
@@ -104,9 +104,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
         }
 
-        this.input_text.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
-        this.input_text.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
-        this.input_text.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
+        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+        this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
     }
 
@@ -159,7 +159,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         {
             this.incorrect_chars += c;
         }
-        this.input_text.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
+        this.phrase.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
 
     private void DeleteChar()
@@ -173,6 +173,6 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             this.required_chars = this.inputted_chars[this.inputted_chars.Length - 1] + this.required_chars;
             this.inputted_chars = this.inputted_chars.Remove(this.inputted_chars.Length - 1);
         }
-        this.input_text.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
+        this.phrase.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
 }
