@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-class KeyState {
+class KeyState
+{
     public RectTransform rectTransform;
     public float timer;
-    public KeyState (RectTransform rt) {
+    public KeyState(RectTransform rt)
+    {
         this.rectTransform = rt;
         this.timer = 0f;
     }
@@ -54,7 +56,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;
             Text key_char = rt.Find("Char").GetComponent<Text>();
-            key_char.text = "" + (char)('A'+i);
+            key_char.text = "" + (char)('A' + i);
             key_char.fontSize = FONT_SIZE;
             this.keys.Add((char)('A' + i), new KeyState(rt));
         }
@@ -91,9 +93,11 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 float scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.keys[target_char].rectTransform.sizeDelta.x;
                 this.keys[target_char].rectTransform.localScale = new Vector3(scale, scale, 0);
 
-                if (this.keys[target_char].timer > 0f) {
+                if (this.keys[target_char].timer > 0f)
+                {
                     this.keys[target_char].timer -= Time.deltaTime;
-                    if (this.keys[target_char].timer <= 0f) {
+                    if (this.keys[target_char].timer <= 0f)
+                    {
                         this.keys[target_char].rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
                     }
                 }
@@ -110,13 +114,16 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     {
         // 触れた位置とキー中心の距離がKEY_DISTANCE/sqrt(2)以下であるような，最も近いキーに判定を入れる
 
-        for (int i = 0; i < 4; i++) {
-            float min_dist = float.MaxValue; 
+        for (int i = 0; i < 4; i++)
+        {
+            float min_dist = float.MaxValue;
             char _char = ' ';
-            foreach (KeyValuePair<char, KeyState> target in this.keys) {
+            foreach (KeyValuePair<char, KeyState> target in this.keys)
+            {
                 float dist = Vector2.Distance(target.Value.rectTransform.anchoredPosition, fingertipAnchoredPositions[i]);
                 float lim = (target.Value.rectTransform.sizeDelta.x * target.Value.rectTransform.localScale.x) / KEY_SIZE * KEY_DISTANCE / Mathf.Sqrt(2);
-                if (dist <= lim && dist < min_dist) {
+                if (dist <= lim && dist < min_dist)
+                {
                     min_dist = dist;
                     _char = target.Key;
                 }
@@ -128,7 +135,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     public void Click(int index)
     {
         char c = this.hovered_chars[index];
-        if (c != ' ') {
+        if (c != ' ')
+        {
             this.InputChar(c);
             this.keys[c].timer = 0.3f;
             this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;

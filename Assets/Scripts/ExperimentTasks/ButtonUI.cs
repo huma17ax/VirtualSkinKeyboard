@@ -65,13 +65,15 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
 
     void Update()
     {
-        if (this.check_to_start) {
+        if (this.check_to_start)
+        {
             this.check_to_start = false;
             this.timer = 0.5f;
             this.timer_state = TIMER_STATE.REST;
         }
 
-        if (this.skip) {
+        if (this.skip)
+        {
             this.skip = false;
             this.timer = 1f;
             this.timer_state = TIMER_STATE.ACCEPTING;
