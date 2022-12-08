@@ -3,8 +3,6 @@ import time
 
 import logger
 
-from marker_detector import detect_marker
-
 from hand_tracker import HandTracker
 from image_sender import ImageSender
 from landmarks_sender import LandmarksSender
