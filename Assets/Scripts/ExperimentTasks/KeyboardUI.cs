@@ -21,7 +21,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
 
-    private Text input_text;
+    private RectTransform input_text;
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
@@ -35,7 +35,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
-        this.input_text = this.rect_transform.Find("InputTexts").GetComponent<Text>();
+        this.input_text = this.rect_transform.Find("InputTexts").GetComponent<RectTransform>();
 
         for (int i = 0; i < 26; i++)
         {
@@ -47,6 +47,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             key_char.fontSize = FONT_SIZE;
             this.keys.Add((char)('A' + i), rt);
         }
+
+        this.input_text.GetComponent<Text>().text = this.required_chars;
     }
 
     void Update()
@@ -77,13 +79,17 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
         }
 
+        this.input_text.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        this.input_text.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+        this.input_text.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
+
     }
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
         // 触れた位置とキー中心の距離がKEY_DISTANCE/sqrt(2)以下であるような，最も近いキーに判定を入れる
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 4; i++) {
             float min_dist = float.MaxValue; 
             char _char = ' ';
             foreach (KeyValuePair<char, RectTransform> target in this.keys) {
@@ -100,9 +106,10 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void Click(int index)
     {
-        this.input_text.text += this.hovered_chars[index];
-        Logger.Logging(new TouchedKeyLog(this.hovered_chars[index]));
-        if (this.input_text.text.Length > 35) this.input_text.text.Remove(0, 1);
+        if (this.hovered_chars[index] != ' ') {
+            this.InputChar(this.hovered_chars[index]);
+            Logger.Logging(new TouchedKeyLog(this.hovered_chars[index]));
+        }
     }
 
     private void InputChar(char c)
@@ -120,7 +127,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         {
             this.incorrect_chars += c;
         }
-        this.input_text.text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
+        this.input_text.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
 
     private void DeleteChar()
@@ -134,6 +141,6 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             this.required_chars = this.inputted_chars[this.inputted_chars.Length - 1] + this.required_chars;
             this.inputted_chars = this.inputted_chars.Remove(this.inputted_chars.Length - 1);
         }
-        this.input_text.text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
+        this.input_text.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
 }
