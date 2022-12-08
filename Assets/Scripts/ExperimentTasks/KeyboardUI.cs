@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+class KeyState {
+    public RectTransform rectTransform;
+    public float timer;
+    public KeyState (RectTransform rt) {
+        this.rectTransform = rt;
+        this.timer = 0f;
+    }
+}
+
 public class KeyboardUI : MonoBehaviour, IExperimentUI
 {
     public GameObject keyPrefab;
@@ -17,7 +26,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private ARMarkerDetector detector;
     private RectTransform background_transform;
 
-    private Dictionary<char, RectTransform> keys = new Dictionary<char, RectTransform>();
+    private Dictionary<char, KeyState> keys = new Dictionary<char, KeyState>();
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
 
@@ -28,6 +37,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private string required_chars = "ABCDEFGHIJ";
 
     private static readonly string[] keys_array = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
+
+    private Texture2D normal_key_texture, touched_key_texture;
 
     void Start()
     {
@@ -45,8 +56,11 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             Text key_char = rt.Find("Char").GetComponent<Text>();
             key_char.text = "" + (char)('A'+i);
             key_char.fontSize = FONT_SIZE;
-            this.keys.Add((char)('A' + i), rt);
+            this.keys.Add((char)('A' + i), new KeyState(rt));
         }
+
+        this.normal_key_texture = Resources.Load<Texture2D>("Images/box");
+        this.touched_key_texture = Resources.Load<Texture2D>("Images/picked_box");
 
         this.input_text.GetComponent<Text>().text = this.required_chars;
     }
@@ -70,12 +84,19 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             {
                 char target_char = keys_row[j];
                 Vector2 pos = scaled_marker_position + scaled_axis * ((10 - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
-                this.keys[target_char].anchoredPosition = pos;
+                this.keys[target_char].rectTransform.anchoredPosition = pos;
 
-                this.keys[target_char].localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+                this.keys[target_char].rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
 
-                float scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.keys[target_char].sizeDelta.x;
-                this.keys[target_char].localScale = new Vector3(scale, scale, 0);
+                float scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.keys[target_char].rectTransform.sizeDelta.x;
+                this.keys[target_char].rectTransform.localScale = new Vector3(scale, scale, 0);
+
+                if (this.keys[target_char].timer > 0f) {
+                    this.keys[target_char].timer -= Time.deltaTime;
+                    if (this.keys[target_char].timer <= 0f) {
+                        this.keys[target_char].rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
+                    }
+                }
             }
         }
 
@@ -92,9 +113,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         for (int i = 0; i < 4; i++) {
             float min_dist = float.MaxValue; 
             char _char = ' ';
-            foreach (KeyValuePair<char, RectTransform> target in this.keys) {
-                float dist = Vector2.Distance(target.Value.anchoredPosition, fingertipAnchoredPositions[i]);
-                float lim = (target.Value.sizeDelta.x * target.Value.localScale.x) / KEY_SIZE * KEY_DISTANCE / Mathf.Sqrt(2);
+            foreach (KeyValuePair<char, KeyState> target in this.keys) {
+                float dist = Vector2.Distance(target.Value.rectTransform.anchoredPosition, fingertipAnchoredPositions[i]);
+                float lim = (target.Value.rectTransform.sizeDelta.x * target.Value.rectTransform.localScale.x) / KEY_SIZE * KEY_DISTANCE / Mathf.Sqrt(2);
                 if (dist <= lim && dist < min_dist) {
                     min_dist = dist;
                     _char = target.Key;
@@ -106,9 +127,12 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void Click(int index)
     {
-        if (this.hovered_chars[index] != ' ') {
-            this.InputChar(this.hovered_chars[index]);
-            Logger.Logging(new TouchedKeyLog(this.hovered_chars[index]));
+        char c = this.hovered_chars[index];
+        if (c != ' ') {
+            this.InputChar(c);
+            this.keys[c].timer = 0.3f;
+            this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+            Logger.Logging(new TouchedKeyLog(c));
         }
     }
 
