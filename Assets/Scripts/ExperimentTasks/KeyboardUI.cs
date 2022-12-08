@@ -81,6 +81,21 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
+        // 触れた位置とキー中心の距離がKEY_DISTANCE/sqrt(2)以下であるような，最も近いキーに判定を入れる
+
+        for (int i = 0; i < 1; i++) {
+            float min_dist = float.MaxValue; 
+            char _char = ' ';
+            foreach (KeyValuePair<char, RectTransform> target in this.keys) {
+                float dist = Vector2.Distance(target.Value.anchoredPosition, fingertipAnchoredPositions[i]);
+                float lim = (target.Value.sizeDelta.x * target.Value.localScale.x) / KEY_SIZE * KEY_DISTANCE / Mathf.Sqrt(2);
+                if (dist <= lim && dist < min_dist) {
+                    min_dist = dist;
+                    _char = target.Key;
+                }
+            }
+            this.hovered_chars[i] = _char;
+        }
     }
 
     public void Click(int index)
