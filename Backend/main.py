@@ -51,7 +51,7 @@ try:
 
         logger.recording(frame)
 
-        sh_image1.set(detect_marker(frame))
+        sh_image1.set(frame)
         sh_image2.set(frame)
 
         viewer.replot()
