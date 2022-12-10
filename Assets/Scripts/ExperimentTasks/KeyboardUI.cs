@@ -29,6 +29,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private RectTransform background_transform;
 
     private Dictionary<char, KeyState> keys = new Dictionary<char, KeyState>();
+    private KeyState SD_key;
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
 
@@ -60,6 +61,10 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             key_char.fontSize = FONT_SIZE;
             this.keys.Add((char)('A' + i), new KeyState(rt));
         }
+        RectTransform sd_rt = Instantiate(this.keyPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform).GetComponent<RectTransform>();
+        sd_rt.localPosition = Vector3.zero;
+        sd_rt.Find("Char").GetComponent<Text>().text = "";
+        this.SD_key = new KeyState(sd_rt);
 
         this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
         this.touched_key_texture = Resources.Load<Texture2D>("Images/red_box");
@@ -85,7 +90,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             for (int j = 0; j < keys_row.Length; j++)
             {
                 char target_char = keys_row[j];
-                Vector2 pos = scaled_marker_position + scaled_axis * ((10 - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
+                Vector2 pos = scaled_marker_position + scaled_axis * ((11.25f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
                 this.keys[target_char].rectTransform.anchoredPosition = pos;
 
                 this.keys[target_char].rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -104,7 +109,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
         }
 
-        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        Vector2 sd_pos = scaled_marker_position + scaled_axis * (1 * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * 0f;
+        this.SD_key.rectTransform.anchoredPosition = sd_pos;
+        this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+        float sd_scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
+        this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale*3, 0);
+
+        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
@@ -129,19 +140,31 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 }
             }
             this.hovered_chars[i] = _char;
+
+            Vector2 rotpos = this.SD_key.rectTransform.localRotation * fingertipAnchoredPositions[i];
+            Vector2 displacement = this.SD_key.rectTransform.anchoredPosition - rotpos;
+            Vector2 sd_key_size = this.SD_key.rectTransform.sizeDelta * this.SD_key.rectTransform.localScale;
+            if (Mathf.Abs(displacement.x) < sd_key_size.x && Mathf.Abs(displacement.y) < sd_key_size.y) {
+                this.hovered_chars[i] = '#';
+            }
         }
     }
 
     public void Click(int index)
     {
         char c = this.hovered_chars[index];
-        if (c != ' ')
+        if (c == '#') {
+            this.DeleteChar();
+            this.SD_key.timer = 0.3f;
+            this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+        }
+        else if (c != ' ')
         {
             this.InputChar(c);
             this.keys[c].timer = 0.3f;
             this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
-            Logger.Logging(new TouchedKeyLog(c));
         }
+        Logger.Logging(new TouchedKeyLog(c));
     }
 
     private void InputChar(char c)
