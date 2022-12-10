@@ -141,13 +141,27 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
             this.hovered_chars[i] = _char;
 
-            Vector2 rotpos = this.SD_key.rectTransform.localRotation * fingertipAnchoredPositions[i];
-            Vector2 displacement = this.SD_key.rectTransform.anchoredPosition - rotpos;
-            Vector2 sd_key_size = this.SD_key.rectTransform.sizeDelta * this.SD_key.rectTransform.localScale;
-            if (Mathf.Abs(displacement.x) < sd_key_size.x && Mathf.Abs(displacement.y) < sd_key_size.y) {
+            float key_angle_rad = this.SD_key.rectTransform.localEulerAngles.z * Mathf.Deg2Rad;
+            Vector2 lateral = new Vector2(Mathf.Cos(key_angle_rad), Mathf.Sin(key_angle_rad)) * 10;
+            float dist_height = DistancePointToLine(
+                fingertipAnchoredPositions[i] - this.SD_key.rectTransform.anchoredPosition,
+                lateral);
+            Vector2 longitudinal = Quaternion.Euler(0, 0, 90) * lateral;
+            float dist_width = DistancePointToLine(
+                fingertipAnchoredPositions[i] - this.SD_key.rectTransform.anchoredPosition,
+                longitudinal);
+            Vector2 sd_key_range = this.SD_key.rectTransform.sizeDelta * this.SD_key.rectTransform.localScale / 2;
+            if (dist_width < sd_key_range.x && dist_height < sd_key_range.y) {
                 this.hovered_chars[i] = '#';
             }
         }
+    }
+
+    private static float DistancePointToLine(Vector2 point, Vector2 line)
+    {
+        // 直線(ベクトル)と点の距離を返す
+        float angle = Vector2.Angle(line, point) * Mathf.Deg2Rad;
+        return point.magnitude * Mathf.Sin(angle);
     }
 
     public void Click(int index)
