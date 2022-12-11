@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +34,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private KeyState SD_key;
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
+    private bool[] is_touching = {false, false, false, false};
 
     private RectTransform phrase;
 
@@ -59,7 +62,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private static readonly string[] keys_array = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
 
-    private Texture2D normal_key_texture, touched_key_texture, disabled_key_texture;
+    private Texture2D normal_key_texture, clicked_key_texture, touching_key_texture, disabled_key_texture;
 
     void Start()
     {
@@ -85,7 +88,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.SD_key = new KeyState(sd_rt);
 
         this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
-        this.touched_key_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.clicked_key_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.touching_key_texture = Resources.Load<Texture2D>("Images/green_box");
         this.disabled_key_texture = Resources.Load<Texture2D>("Images/gray_out_box");
 
         this.StopTyping();
@@ -120,10 +124,6 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 if (this.keys[target_char].timer > 0f)
                 {
                     this.keys[target_char].timer -= Time.deltaTime;
-                    if (this.keys[target_char].timer <= 0f)
-                    {
-                        this.keys[target_char].rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
-                    }
                 }
             }
         }
@@ -136,16 +136,32 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         if (this.SD_key.timer > 0f)
         {
             this.SD_key.timer -= Time.deltaTime;
-            if (this.SD_key.timer <= 0f)
-            {
-                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
-            }
         }
 
         this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
+        this.UpdateKeyTextures();
+    }
+
+    private void UpdateKeyTextures() {
+        Texture2D applying_texture;
+        char[] touching_chars = this.hovered_chars.Where((c, i) => this.is_touching[i]).ToArray();
+
+        foreach (KeyValuePair<char, KeyState> target in this.keys)
+        {
+            if (this.input_accepting == false) applying_texture = this.disabled_key_texture;
+            else if (target.Value.timer > 0f) applying_texture = this.clicked_key_texture;
+            else if (touching_chars.Contains(target.Key)) applying_texture = this.touching_key_texture;
+            else applying_texture = this.normal_key_texture;
+            target.Value.rectTransform.GetComponent<RawImage>().texture = applying_texture;
+        }
+        
+        if (this.SD_key.timer > 0f) applying_texture = this.clicked_key_texture;
+        else if (touching_chars.Contains('#')) applying_texture = this.touching_key_texture;
+        else applying_texture = this.normal_key_texture;
+        this.SD_key.rectTransform.GetComponent<RawImage>().texture = applying_texture;
     }
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
@@ -193,42 +209,36 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void Press(int index)
     {
+        this.is_touching[index] = true;
         char c = this.hovered_chars[index];
         Logger.Logging(new TouchedKeyLog(c));
         if (this.input_accepting == false) {
             if (c == '#') {
                 // Startキーとして機能する
                 this.StartTyping();
-                this.SD_key.timer = 0.3f;
-                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+                this.SD_key.timer = 0.15f;
             }
         }
         else {
             if (c == '#') {
                 // Deleteキーとして機能する
                 this.DeleteChar();
-                this.SD_key.timer = 0.3f;
-                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+                this.SD_key.timer = 0.15f;
             }
             else if (c != ' ') {
                 this.InputChar(c);
-                this.keys[c].timer = 0.3f;
-                this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+                this.keys[c].timer = 0.15f;
                 if (this.required_chars == "") this.StopTyping();
             }
         }
     }
     public void Release(int index) {
+        this.is_touching[index] = false;
     }
 
     private void StartTyping() {
         if (this.phrase_index == phrases_set.GetLength(1)) return;
         this.input_accepting = true;
-        
-        foreach (KeyValuePair<char, KeyState> target in this.keys)
-        {
-            target.Value.rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
-        }
     }
 
     private void StopTyping() {
@@ -236,7 +246,6 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
         foreach (KeyValuePair<char, KeyState> target in this.keys)
         {
-            target.Value.rectTransform.GetComponent<RawImage>().texture = this.disabled_key_texture;
             target.Value.timer = 0f;
         }
         
