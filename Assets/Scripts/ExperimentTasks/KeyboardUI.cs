@@ -191,7 +191,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         return point.magnitude * Mathf.Sin(angle);
     }
 
-    public void Click(int index)
+    public void Press(int index)
     {
         char c = this.hovered_chars[index];
         Logger.Logging(new TouchedKeyLog(c));
@@ -217,6 +217,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 if (this.required_chars == "") this.StopTyping();
             }
         }
+    }
+    public void Release(int index) {
     }
 
     private void StartTyping() {

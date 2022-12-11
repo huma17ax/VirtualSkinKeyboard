@@ -149,7 +149,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.fingerPositions = fingertipAnchoredPositions;
     }
 
-    public void Click(int index)
+    public void Press(int index)
     {
         Logger.Logging(
             new TouchToButtonLog(
@@ -168,6 +168,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 Logger.Logging(new TimerStateLog("ACC", this.picked_index));
             }
         }
+    }
+    public void Release(int index){
     }
 
     private void InitStep()
