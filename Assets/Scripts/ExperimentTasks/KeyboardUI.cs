@@ -34,7 +34,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private KeyState SD_key;
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
-    private bool[] is_touching = {false, false, false, false};
+    private bool[] is_touching = { false, false, false, false };
 
     private RectTransform phrase;
 
@@ -132,7 +132,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.SD_key.rectTransform.anchoredPosition = sd_pos;
         this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         float sd_scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
-        this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale*3, 0);
+        this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale * 3, 0);
         if (this.SD_key.timer > 0f)
         {
             this.SD_key.timer -= Time.deltaTime;
@@ -145,7 +145,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.UpdateKeyTextures();
     }
 
-    private void UpdateKeyTextures() {
+    private void UpdateKeyTextures()
+    {
         Texture2D applying_texture;
         char[] touching_chars = this.hovered_chars.Where((c, i) => this.is_touching[i]).ToArray();
 
@@ -157,7 +158,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             else applying_texture = this.normal_key_texture;
             target.Value.rectTransform.GetComponent<RawImage>().texture = applying_texture;
         }
-        
+
         if (this.SD_key.timer > 0f) applying_texture = this.clicked_key_texture;
         else if (touching_chars.Contains('#')) applying_texture = this.touching_key_texture;
         else applying_texture = this.normal_key_texture;
@@ -194,7 +195,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 fingertipAnchoredPositions[i] - this.SD_key.rectTransform.anchoredPosition,
                 longitudinal);
             Vector2 sd_key_range = this.SD_key.rectTransform.sizeDelta * this.SD_key.rectTransform.localScale / 2;
-            if (dist_width < sd_key_range.x && dist_height < sd_key_range.y) {
+            if (dist_width < sd_key_range.x && dist_height < sd_key_range.y)
+            {
                 this.hovered_chars[i] = '#';
             }
         }
@@ -212,49 +214,59 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.is_touching[index] = true;
         char c = this.hovered_chars[index];
         Logger.Logging(new TouchedKeyLog(c));
-        if (this.input_accepting == false) {
-            if (c == '#') {
+        if (this.input_accepting == false)
+        {
+            if (c == '#')
+            {
                 // Startキーとして機能する
                 this.StartTyping();
                 this.SD_key.timer = 0.15f;
             }
         }
-        else {
-            if (c == '#') {
+        else
+        {
+            if (c == '#')
+            {
                 // Deleteキーとして機能する
                 this.DeleteChar();
                 this.SD_key.timer = 0.15f;
             }
-            else if (c != ' ') {
+            else if (c != ' ')
+            {
                 this.InputChar(c);
                 this.keys[c].timer = 0.15f;
                 if (this.required_chars == "") this.StopTyping();
             }
         }
     }
-    public void Release(int index) {
+    public void Release(int index)
+    {
         this.is_touching[index] = false;
     }
 
-    private void StartTyping() {
+    private void StartTyping()
+    {
         if (this.phrase_index == phrases_set.GetLength(1)) return;
         this.input_accepting = true;
     }
 
-    private void StopTyping() {
+    private void StopTyping()
+    {
         this.input_accepting = false;
 
         foreach (KeyValuePair<char, KeyState> target in this.keys)
         {
             target.Value.timer = 0f;
         }
-        
+
         this.phrase_index++;
         this.inputted_chars = "";
-        if (this.phrase_index == phrases_set.GetLength(1)) {
+        if (this.phrase_index == phrases_set.GetLength(1))
+        {
             this.required_chars = "";
         }
-        else {
+        else
+        {
             this.required_chars = phrases_set[this.phrases_set_index, this.phrase_index];
         }
         this.phrase.GetComponent<Text>().text = this.required_chars;

@@ -169,7 +169,8 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
             }
         }
     }
-    public void Release(int index){
+    public void Release(int index)
+    {
     }
 
     private void InitStep()
