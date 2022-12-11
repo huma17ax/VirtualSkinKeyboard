@@ -37,11 +37,29 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
-    private string required_chars = "ABCDEFGHIJ";
+    private string required_chars = "";
+    private static readonly string[,] phrases_set = {
+        {"GZASNDFYUE","JWOTXPCHVB","QMKIRLHFCJ","XSNMPTYORL","QBWUVAIGDE",
+        "ZKTLENRHCJ","UDWZSQBFAP","MIGVOXKYQT","WOEJNDRCBV","GLUMHZYFSA",
+        "KIXPZLMOUT","RPKDINQSJF","YGWBCHEXAV"},
+        {"UMEVWZLJNK","IDTCYFBPOQ","HSRGAXLZCU","RGKXFBOYET","JQVWHNMADI",
+        "PSKYVCROGQ","XFTEIMWDAS","JNLBUZHPEQ","NGZPCMAFJL","DVBUHIYTSX",
+        "KWOREDMVQC","ZXUKHBRNTO","WPYIAFLGSJ",},
+        {"ZCLHQWYPFD","IANGTSXUKM","EOJBVRCAZH","WYMLRSGUVT","XDFNEQIBJP",
+        "OKFPUZWDSE","BYIQGMLNJR","CAHOVXKTQB","JEYSTCNMDW","APGZRLKIVF",
+        "UOXHZGDWFR","KPULSVOHJN","QYIETAMBCX",},
+        {"PIZCEHWKVN","YGUQLXDBRA","TSMFJOUAGC","IWFTPDZYVS","MNBOEQLXRJ",
+        "KHGXTYACPL","SUBFKVIDOR","WHJQZMENSB","NQEFRHKUXJ","OAGDZCLMVI",
+        "TWYPBCFRND","PEMJOYKGHV","WAQSXTZULI",}
+    };
+    public int phrases_set_index = 0;
+    private int phrase_index = -1;
+
+    bool input_accepting = false;
 
     private static readonly string[] keys_array = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
 
-    private Texture2D normal_key_texture, touched_key_texture;
+    private Texture2D normal_key_texture, touched_key_texture, disabled_key_texture;
 
     void Start()
     {
@@ -68,8 +86,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
         this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
         this.touched_key_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.disabled_key_texture = Resources.Load<Texture2D>("Images/gray_out_box");
 
-        this.phrase.GetComponent<Text>().text = this.required_chars;
+        this.StopTyping();
     }
 
     void Update()
@@ -167,18 +186,59 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     public void Click(int index)
     {
         char c = this.hovered_chars[index];
-        if (c == '#') {
-            this.DeleteChar();
-            this.SD_key.timer = 0.3f;
-            this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
-        }
-        else if (c != ' ')
-        {
-            this.InputChar(c);
-            this.keys[c].timer = 0.3f;
-            this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
-        }
         Logger.Logging(new TouchedKeyLog(c));
+        if (this.input_accepting == false) {
+            if (c == '#') {
+                // Startキーとして機能する
+                this.StartTyping();
+                this.SD_key.timer = 0.3f;
+                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+            }
+        }
+        else {
+            if (c == '#') {
+                // Deleteキーとして機能する
+                this.DeleteChar();
+                this.SD_key.timer = 0.3f;
+                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+            }
+            else if (c != ' ') {
+                this.InputChar(c);
+                this.keys[c].timer = 0.3f;
+                this.keys[c].rectTransform.GetComponent<RawImage>().texture = this.touched_key_texture;
+                if (this.required_chars == "") this.StopTyping();
+            }
+        }
+    }
+
+    private void StartTyping() {
+        if (this.phrase_index == phrases_set.GetLength(1)) return;
+        this.input_accepting = true;
+        
+        foreach (KeyValuePair<char, KeyState> target in this.keys)
+        {
+            target.Value.rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
+        }
+    }
+
+    private void StopTyping() {
+        this.input_accepting = false;
+
+        foreach (KeyValuePair<char, KeyState> target in this.keys)
+        {
+            target.Value.rectTransform.GetComponent<RawImage>().texture = this.disabled_key_texture;
+            target.Value.timer = 0f;
+        }
+        
+        this.phrase_index++;
+        this.inputted_chars = "";
+        if (this.phrase_index == phrases_set.GetLength(1)) {
+            this.required_chars = "";
+        }
+        else {
+            this.required_chars = phrases_set[this.phrases_set_index, this.phrase_index];
+        }
+        this.phrase.GetComponent<Text>().text = this.required_chars;
     }
 
     private void InputChar(char c)
