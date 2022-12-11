@@ -5,5 +5,6 @@ using UnityEngine;
 interface IExperimentUI
 {
     void CalcHoverKey(Vector2[] fingertipAnchoredPositions);
-    void Click(int index);
+    void Press(int index);
+    void Release(int index);
 }

@@ -56,22 +56,24 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
 
-        this.normal_button_texture = Resources.Load<Texture2D>("Images/box");
-        this.picked_button_texture = Resources.Load<Texture2D>("Images/picked_box");
-        this.selected_button_texture = Resources.Load<Texture2D>("Images/selected_box");
+        this.normal_button_texture = Resources.Load<Texture2D>("Images/black_box");
+        this.picked_button_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.selected_button_texture = Resources.Load<Texture2D>("Images/green_box");
 
         this.InitStep();
     }
 
     void Update()
     {
-        if (this.check_to_start) {
+        if (this.check_to_start)
+        {
             this.check_to_start = false;
             this.timer = 0.5f;
             this.timer_state = TIMER_STATE.REST;
         }
 
-        if (this.skip) {
+        if (this.skip)
+        {
             this.skip = false;
             this.timer = 1f;
             this.timer_state = TIMER_STATE.ACCEPTING;
@@ -147,7 +149,7 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.fingerPositions = fingertipAnchoredPositions;
     }
 
-    public void Click(int index)
+    public void Press(int index)
     {
         Logger.Logging(
             new TouchToButtonLog(
@@ -166,6 +168,9 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
                 Logger.Logging(new TimerStateLog("ACC", this.picked_index));
             }
         }
+    }
+    public void Release(int index)
+    {
     }
 
     private void InitStep()

@@ -39,8 +39,8 @@ public class FingertipMarkerManager : MonoBehaviour
         this.touchReceiver = new TouchReceiver(this.sh_touches);
         this.touchReceiver.Start();
 
-        // this.UI = GameObject.Find("Canvas/Keyboard").GetComponent<KeyboardUI>();
-        this.UI = GameObject.Find("Canvas/Buttons").GetComponent<ButtonUI>();
+        this.UI = GameObject.Find("Canvas/Keyboard").GetComponent<KeyboardUI>();
+        // this.UI = GameObject.Find("Canvas/Buttons").GetComponent<ButtonUI>();
 
         RectTransform background = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         image_width = 640 * background.localScale.x;
@@ -72,7 +72,8 @@ public class FingertipMarkerManager : MonoBehaviour
             for (int i = 0; i < 4; i++)
             {
                 this.markerRectTransforms[i].localScale = (b[i] ? new Vector3(2, 2, 1) : new Vector3(1, 1, 1));
-                if (pre[i] == false && b[i] == true) this.UI.Click(i);
+                if (pre[i] == false && b[i] == true) this.UI.Press(i);
+                if (pre[i] == true && b[i] == false) this.UI.Release(i);
             }
             pre = b;
         }
