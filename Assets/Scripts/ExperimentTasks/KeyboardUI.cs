@@ -133,6 +133,14 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         float sd_scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
         this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale*3, 0);
+        if (this.SD_key.timer > 0f)
+        {
+            this.SD_key.timer -= Time.deltaTime;
+            if (this.SD_key.timer <= 0f)
+            {
+                this.SD_key.rectTransform.GetComponent<RawImage>().texture = this.normal_key_texture;
+            }
+        }
 
         this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
