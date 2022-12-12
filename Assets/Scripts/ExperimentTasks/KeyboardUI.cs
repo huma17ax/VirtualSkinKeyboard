@@ -21,10 +21,11 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     public GameObject keyPrefab;
 
     private const float MARKER_SIZE = 24;// 実際のマーカーの大きさ[mm]
-    private const float KEY_SIZE = 15;// キーの一辺の大きさ[mm]
-    private const float KEY_DISTANCE = 15;// キーの中心間の距離[mm]
-    private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからの距離[mm]
-    private const int FONT_SIZE = 80;// キーに表示される文字の大きさ
+    private const float KEY_SIZE = 10;// キーの一辺の大きさ[mm]
+    private const float KEY_DISTANCE = 17.1f;// キーの中心間の距離[mm]
+    private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからキーUIの距離[mm]
+    private readonly Vector2 DETECTION_CENTER_OFFSET = new Vector2(-1.88f, -0.35f);// キーの中心と当たり判定の中心の差
+    private const int FONT_SIZE = 110;// キーに表示される文字の大きさ
 
     private RectTransform rect_transform;
     private ARMarkerDetector detector;
@@ -167,7 +168,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
-        // 触れた位置とキー中心の距離がKEY_DISTANCE/sqrt(2)以下であるような，最も近いキーに判定を入れる
+        // 触れた位置と判定中心の距離がKEY_DISTANCE*5/8以下であるような，最も近いキーに判定を入れる
 
         for (int i = 0; i < 4; i++)
         {
@@ -175,8 +176,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             char _char = ' ';
             foreach (KeyValuePair<char, KeyState> target in this.keys)
             {
-                float dist = Vector2.Distance(target.Value.rectTransform.anchoredPosition, fingertipAnchoredPositions[i]);
-                float lim = (target.Value.rectTransform.sizeDelta.x * target.Value.rectTransform.localScale.x) / KEY_SIZE * KEY_DISTANCE / Mathf.Sqrt(2);
+                float ratio_dots_per_mm = (target.Value.rectTransform.sizeDelta.x * target.Value.rectTransform.localScale.x) / KEY_SIZE;
+                float dist = Vector2.Distance(target.Value.rectTransform.anchoredPosition + DETECTION_CENTER_OFFSET * ratio_dots_per_mm, fingertipAnchoredPositions[i]);
+                float lim = KEY_DISTANCE * ratio_dots_per_mm * 5f / 8f;
                 if (dist <= lim && dist < min_dist)
                 {
                     min_dist = dist;
