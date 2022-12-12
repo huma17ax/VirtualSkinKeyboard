@@ -37,7 +37,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
     private bool[] is_touching = { false, false, false, false };
 
-    private RectTransform phrase;
+    private RectTransform phrase, warning;
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
@@ -72,6 +72,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.detector = GameObject.Find("ARMarkerDetecter").GetComponent<ARMarkerDetector>();
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         this.phrase = this.rect_transform.Find("Phrase").GetComponent<RectTransform>();
+        this.warning = this.rect_transform.Find("Warning").GetComponent<RectTransform>();
 
         for (int i = 0; i < 26; i++)
         {
@@ -142,6 +143,11 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
+
+        this.warning.anchoredPosition = scaled_marker_position + downward * -1f;
+        this.warning.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
+        this.warning.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
+        this.warning.gameObject.SetActive(this.detector.markerTiltWarning);
 
         this.UpdateKeyTextures();
     }

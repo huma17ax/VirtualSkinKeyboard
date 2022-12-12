@@ -14,10 +14,13 @@ public class ARMarkerDetector : MonoBehaviour
     private Renderer bg_renderer;
     private GameObject ar_obj;
     private GameObject ar_next_obj;
+    private GameObject ar_above_obj;
 
     private bool isActive = false;
     public Vector2 markerPosition = new Vector2(0, 0);
     public Vector2 nextPosition = new Vector2(0, 0);
+    public Vector2 abovePosition = new Vector2(0, 0);
+    public bool markerTiltWarning = false;
 
     private bool log_flag = false;
 
@@ -27,6 +30,7 @@ public class ARMarkerDetector : MonoBehaviour
         this.bg_renderer = this.bg_panel.GetComponent<Renderer>();
         this.ar_obj = this.transform.Find("ARObject").gameObject;
         this.ar_next_obj = this.transform.Find("ARObject/Next").gameObject;
+        this.ar_above_obj = this.transform.Find("ARObject/Above").gameObject;
     }
 
     void Update()
@@ -38,6 +42,7 @@ public class ARMarkerDetector : MonoBehaviour
             {
                 this.ms.setTransform(marker_id, this.ar_obj.transform);
                 this.calcMarkerPosition();
+                this.DetectMarkerTilt();
             }
             else
             {
@@ -102,12 +107,44 @@ public class ARMarkerDetector : MonoBehaviour
                 break;
             }
         }
+
+        hits = Physics.RaycastAll(
+            new Ray(this.transform.position, this.ar_above_obj.transform.position - this.transform.position)
+        );
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.gameObject == this.bg_panel)
+            {
+                float x = hit.point.x / this.bg_renderer.bounds.size.x;
+                float y = hit.point.y / this.bg_renderer.bounds.size.y;
+                this.abovePosition = new Vector2(x, y);
+                break;
+            }
+        }
+    }
+
+    private void DetectMarkerTilt()
+    {
+        Vector2 horizontal = (this.nextPosition - this.markerPosition) * this.bg_renderer.bounds.size;
+        Vector2 vertical = (this.abovePosition - this.markerPosition) * this.bg_renderer.bounds.size;
+        float diff = Mathf.Abs(horizontal.magnitude - vertical.magnitude) / Mathf.Max(horizontal.magnitude, vertical.magnitude);
+        float angle = Vector2.Angle(horizontal, vertical);
+        if (diff > 0.1f || Mathf.Abs(angle - 90f) > 10f)
+        {
+            this.markerTiltWarning = true;
+        }
+        else
+        {
+            this.markerTiltWarning = false;
+        }
     }
 
     private void resetMarkerPosition()
     {
         this.markerPosition = new Vector2(0, 0);
         this.nextPosition = new Vector2(0, 0);
+        this.abovePosition = new Vector2(0, 0);
+        this.markerTiltWarning = false;
     }
 
 }
