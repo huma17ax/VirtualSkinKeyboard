@@ -64,6 +64,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private static readonly string[] keys_array = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
 
     private Texture2D normal_key_texture, clicked_key_texture, touching_key_texture, disabled_key_texture;
+    private Texture2D blue_corner, purple_corner;
 
     void Start()
     {
@@ -73,6 +74,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         this.phrase = this.rect_transform.Find("Phrase").GetComponent<RectTransform>();
 
+        this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
+        this.clicked_key_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.touching_key_texture = Resources.Load<Texture2D>("Images/green_box");
+        this.disabled_key_texture = Resources.Load<Texture2D>("Images/gray_out_box");
+        this.blue_corner = Resources.Load<Texture2D>("Images/corner_blue_line");
+        this.purple_corner = Resources.Load<Texture2D>("Images/corner_purple_line");
+
         for (int i = 0; i < 26; i++)
         {
             GameObject obj = Instantiate(this.keyPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform);
@@ -81,17 +89,22 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             Text key_char = rt.Find("Char").GetComponent<Text>();
             key_char.text = "" + (char)('A' + i);
             key_char.fontSize = FONT_SIZE;
+            RawImage corner = rt.Find("Corner").GetComponent<RawImage>();
+            if ("QAZWSXEDCUJMIK".Contains((char)('A' + i)))
+            {
+                corner.texture = this.blue_corner;
+            }
+            else
+            {
+                corner.texture = this.purple_corner;
+            }
             this.keys.Add((char)('A' + i), new KeyState(rt));
         }
         RectTransform sd_rt = Instantiate(this.keyPrefab, Vector3.zero, new Quaternion(0, 0, 0, 0), this.transform).GetComponent<RectTransform>();
         sd_rt.localPosition = Vector3.zero;
         sd_rt.Find("Char").GetComponent<Text>().text = "";
+        sd_rt.Find("Corner").GetComponent<RawImage>().color = Color.clear;
         this.SD_key = new KeyState(sd_rt);
-
-        this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
-        this.clicked_key_texture = Resources.Load<Texture2D>("Images/red_box");
-        this.touching_key_texture = Resources.Load<Texture2D>("Images/green_box");
-        this.disabled_key_texture = Resources.Load<Texture2D>("Images/gray_out_box");
 
         this.StopTyping();
     }
