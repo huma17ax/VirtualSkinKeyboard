@@ -35,7 +35,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private KeyState SD_key;
 
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
-    private bool[] is_touching = { false, false, false, false };
+    private char[] clicked_chars = { ' ', ' ', ' ', ' ' };
 
     private RectTransform phrase, warning, warning2;
 
@@ -164,18 +164,18 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private void UpdateKeyTextures()
     {
         Texture2D applying_texture;
-        char[] touching_chars = this.hovered_chars.Where((c, i) => this.is_touching[i]).ToArray();
+        // char[] touching_chars = this.hovered_chars.Where((c, i) => this.is_touching[i]).ToArray();
 
         foreach (KeyValuePair<char, KeyState> target in this.keys)
         {
-            if (this.input_accepting == false) applying_texture = this.disabled_key_texture;
-            else if (target.Value.timer > 0f) applying_texture = this.clicked_key_texture;
+            if (clicked_chars.Contains(target.Key)) applying_texture = this.clicked_key_texture;
+            else if (this.input_accepting == false) applying_texture = this.disabled_key_texture;
             // else if (touching_chars.Contains(target.Key)) applying_texture = this.touching_key_texture;
             else applying_texture = this.normal_key_texture;
             target.Value.rectTransform.GetComponent<RawImage>().texture = applying_texture;
         }
 
-        if (this.SD_key.timer > 0f) applying_texture = this.clicked_key_texture;
+        if (clicked_chars.Contains('#')) applying_texture = this.clicked_key_texture;
         // else if (touching_chars.Contains('#')) applying_texture = this.touching_key_texture;
         else applying_texture = this.normal_key_texture;
         this.SD_key.rectTransform.GetComponent<RawImage>().texture = applying_texture;
@@ -218,6 +218,10 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 this.hovered_chars[i] = '#';
             }
         }
+
+        for (int i=0; i<4; i++) {
+            if (this.clicked_chars[i] != this.hovered_chars[i]) this.clicked_chars[i] = ' ';
+        }
     }
 
     private static float DistancePointToLine(Vector2 point, Vector2 line)
@@ -235,9 +239,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void Press(int index)
     {
-        this.is_touching[index] = true;
         char c = this.hovered_chars[index];
         Logger.Logging(new TouchedKeyLog(c));
+        this.clicked_chars[index] = c;
         if (this.input_accepting == false)
         {
             if (c == '#')
@@ -265,7 +269,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     }
     public void Release(int index)
     {
-        this.is_touching[index] = false;
+        this.clicked_chars[index] = ' ';
     }
 
     private void StartTyping()
