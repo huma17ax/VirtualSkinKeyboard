@@ -150,7 +150,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             if (this.phrase_timer < 0f) {
                 this.phrase_timer = 0f;
             }
-            this.phrase.localScale = Vector3.Scale(this.phrase.localScale, new Vector3(1f - this.phrase_timer / 0.3f, this.phrase_timer, 0));
+            this.phrase.GetComponent<Text>().fontSize = (int)(40f * (1f - this.phrase_timer / 0.5f));
         }
 
         this.warning.anchoredPosition = scaled_marker_position + downward * -1f;
@@ -286,7 +286,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         // {
         //     target.Value.timer = 0f;
         // }
-        this.phrase_timer = 0.3f;
+        this.phrase_timer = 0.5f;
 
         this.phrase_index++;
         this.inputted_chars = "";
