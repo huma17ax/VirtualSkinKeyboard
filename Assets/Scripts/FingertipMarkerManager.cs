@@ -19,6 +19,8 @@ public class FingertipMarkerManager : MonoBehaviour
     private IExperimentUI UI;
     private bool[] pre = { false, false, false, false };
 
+    Vector2 wrist_position;
+
     void Start()
     {
         markerRectTransforms = new RectTransform[4];
@@ -53,11 +55,14 @@ public class FingertipMarkerManager : MonoBehaviour
         Vector2[] v;
         if (this.sh_landmarks.TryGet(out v))
         {
+            wrist_position = new Vector2(
+                (v[0].x - 0.5f) * this.image_width,
+                -(v[0].y - 0.5f) * this.image_height);
             for (int i = 0; i < 4; i++)
             {
                 this.markerRectTransforms[i].anchoredPosition = new Vector3(
-                    (v[i].x - 0.5f) * this.image_width,
-                    -(v[i].y - 0.5f) * this.image_height,
+                    (v[i+1].x - 0.5f) * this.image_width,
+                    -(v[i+1].y - 0.5f) * this.image_height,
                     0);
             }
         }
@@ -65,6 +70,8 @@ public class FingertipMarkerManager : MonoBehaviour
         this.UI.CalcHoverKey(
             this.markerRectTransforms.Select(rt => rt.anchoredPosition).ToArray()
             );
+        
+        this.UI.NotifyWristPosition(this.wrist_position);
 
         bool[] b;
         if (this.sh_touches.TryGet(out b))

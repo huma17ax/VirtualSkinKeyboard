@@ -37,7 +37,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
     private bool[] is_touching = { false, false, false, false };
 
-    private RectTransform phrase, warning;
+    private RectTransform phrase, warning, warning2;
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
@@ -73,6 +73,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         this.phrase = this.rect_transform.Find("Phrase").GetComponent<RectTransform>();
         this.warning = this.rect_transform.Find("Warning").GetComponent<RectTransform>();
+        this.warning2 = GameObject.Find("Canvas/Warning2").GetComponent<RectTransform>();
 
         for (int i = 0; i < 26; i++)
         {
@@ -215,6 +216,12 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         // 直線(ベクトル)と点の距離を返す
         float angle = Vector2.Angle(line, point) * Mathf.Deg2Rad;
         return point.magnitude * Mathf.Sin(angle);
+    }
+
+    public void NotifyWristPosition(Vector2 pos) {
+        this.warning2.anchoredPosition = new Vector2(pos.x, (-240 * this.background_transform.localScale.y)+30);
+        bool wrist_in_frame = pos.y > (-240 * this.background_transform.localScale.y);
+        this.warning2.gameObject.SetActive(!wrist_in_frame);
     }
 
     public void Press(int index)

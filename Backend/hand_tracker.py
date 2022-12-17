@@ -42,6 +42,7 @@ class HandTracker(Thread):
 
                     self.sh_image_and_landmarks.set((image, hand_landmarks.landmark))
                     fingertips = [
+                        (hand_landmarks.landmark[POS.WRIST].x, hand_landmarks.landmark[POS.WRIST].y),
                         (hand_landmarks.landmark[POS.INDEX_FINGER_TIP].x, hand_landmarks.landmark[POS.INDEX_FINGER_TIP].y),
                         (hand_landmarks.landmark[POS.MIDDLE_FINGER_TIP].x, hand_landmarks.landmark[POS.MIDDLE_FINGER_TIP].y),
                         (hand_landmarks.landmark[POS.RING_FINGER_TIP].x, hand_landmarks.landmark[POS.RING_FINGER_TIP].y),
