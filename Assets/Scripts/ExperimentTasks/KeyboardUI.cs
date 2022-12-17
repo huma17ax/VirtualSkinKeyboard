@@ -20,9 +20,9 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 {
     public GameObject keyPrefab;
 
-    private const float MARKER_SIZE = 24;// 実際のマーカーの大きさ[mm]
+    private const float MARKER_SIZE = 23;// 実際のマーカーの大きさ[mm]
     private const float KEY_SIZE = 10;// キーの一辺の大きさ[mm]
-    private const float KEY_DISTANCE = 17.1f;// キーの中心間の距離[mm]
+    private const float KEY_DISTANCE = 15.8f;// キーの中心間の距離[mm]
     private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからキーUIの距離[mm]
     private readonly Vector2 DETECTION_CENTER_OFFSET = new Vector2(-1.88f, -0.35f);// キーの中心と当たり判定の中心の差
     private const int FONT_SIZE = 110;// キーに表示される文字の大きさ
@@ -116,7 +116,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             for (int j = 0; j < keys_row.Length; j++)
             {
                 char target_char = keys_row[j];
-                Vector2 pos = scaled_marker_position + scaled_axis * ((10.125f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
+                Vector2 pos = scaled_marker_position + scaled_axis * ((10f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
                 this.keys[target_char].rectTransform.anchoredPosition = pos;
 
                 this.keys[target_char].rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -135,13 +135,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.SD_key.rectTransform.anchoredPosition = sd_pos;
         this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         float sd_scale = 1f / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
-        this.SD_key.rectTransform.localScale = new Vector3(17.1f * sd_scale, 55.5f * sd_scale, 0);
+        this.SD_key.rectTransform.localScale = new Vector3(KEY_DISTANCE * sd_scale, 45.5f * sd_scale, 0);
         if (this.SD_key.timer > 0f)
         {
             this.SD_key.timer -= Time.deltaTime;
         }
 
-        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
@@ -175,7 +175,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     public void CalcHoverKey(Vector2[] fingertipAnchoredPositions)
     {
-        // 触れた位置と判定中心の距離がKEY_DISTANCE*5/8以下であるような，最も近いキーに判定を入れる
+        // 触れた位置と判定中心の距離がradius以下であるような，最も近いキーに判定を入れる
+        float radius = Mathf.Sqrt(Mathf.Pow(KEY_DISTANCE/2, 2) + Mathf.Pow(45.5f/2f-KEY_DISTANCE, 2));
 
         for (int i = 0; i < 4; i++)
         {
@@ -185,7 +186,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             {
                 float ratio_dots_per_mm = (target.Value.rectTransform.sizeDelta.x * target.Value.rectTransform.localScale.x) / KEY_SIZE;
                 float dist = Vector2.Distance(target.Value.rectTransform.anchoredPosition + DETECTION_CENTER_OFFSET * ratio_dots_per_mm, fingertipAnchoredPositions[i]);
-                float lim = KEY_DISTANCE * ratio_dots_per_mm * 5f / 8f;
+                float lim = radius * ratio_dots_per_mm;
                 if (dist <= lim && dist < min_dist)
                 {
                     min_dist = dist;
