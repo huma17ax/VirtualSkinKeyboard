@@ -56,13 +56,3 @@ public class ARMarkerLog
         this.angle = Mathf.Atan2(offset.y, offset.x);
     }
 }
-
-public class TouchedKeyLog
-{
-    [SerializeField] private string key;
-
-    public TouchedKeyLog(char _key)
-    {
-        this.key = "" + _key;
-    }
-}
