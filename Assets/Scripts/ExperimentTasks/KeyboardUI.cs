@@ -147,7 +147,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.warning.anchoredPosition = scaled_marker_position + downward * -1f;
         this.warning.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.warning.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
-        this.warning.gameObject.SetActive(this.detector.markerTiltWarning);
+        this.warning.gameObject.SetActive(this.detector.markerTiltWarning || !this.detector.isDetected);
 
         this.UpdateKeyTextures();
     }
