@@ -66,6 +66,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     private Texture2D normal_key_texture, clicked_key_texture, touching_key_texture, disabled_key_texture;
 
+    public bool forceStop = false;
+
     void Start()
     {
         this.rect_transform = this.GetComponent<RectTransform>();
@@ -101,6 +103,18 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
 
     void Update()
     {
+        if (this.forceStop) {
+            this.forceStop = false;
+            this.input_accepting = false;
+            Logger.Logging(
+                new PhraseStateLog(
+                    "ForceStop", this.phrases_set_index, this.phrase_index, ""));
+            this.inputted_chars = "";
+            this.incorrect_chars = "";
+            this.required_chars = phrases_set[this.phrases_set_index, this.phrase_index];
+            this.phrase.GetComponent<Text>().text = this.required_chars;
+        }
+
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
         Vector2 scaled_axis = axis * new Vector2(640, 480) * this.background_transform.localScale;
         Vector2 downward = new Vector2(-scaled_axis.y, scaled_axis.x);
