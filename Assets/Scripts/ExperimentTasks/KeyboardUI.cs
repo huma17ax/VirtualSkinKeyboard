@@ -91,7 +91,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.SD_key = new KeyState(sd_rt);
 
         this.normal_key_texture = Resources.Load<Texture2D>("Images/black_box");
-        this.clicked_key_texture = Resources.Load<Texture2D>("Images/red_box");
+        this.clicked_key_texture = Resources.Load<Texture2D>("Images/red_box_filled");
         this.touching_key_texture = Resources.Load<Texture2D>("Images/green_box");
         this.disabled_key_texture = Resources.Load<Texture2D>("Images/gray_out_box");
 
@@ -162,13 +162,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         {
             if (this.input_accepting == false) applying_texture = this.disabled_key_texture;
             else if (target.Value.timer > 0f) applying_texture = this.clicked_key_texture;
-            else if (touching_chars.Contains(target.Key)) applying_texture = this.touching_key_texture;
+            // else if (touching_chars.Contains(target.Key)) applying_texture = this.touching_key_texture;
             else applying_texture = this.normal_key_texture;
             target.Value.rectTransform.GetComponent<RawImage>().texture = applying_texture;
         }
 
         if (this.SD_key.timer > 0f) applying_texture = this.clicked_key_texture;
-        else if (touching_chars.Contains('#')) applying_texture = this.touching_key_texture;
+        // else if (touching_chars.Contains('#')) applying_texture = this.touching_key_texture;
         else applying_texture = this.normal_key_texture;
         this.SD_key.rectTransform.GetComponent<RawImage>().texture = applying_texture;
     }
