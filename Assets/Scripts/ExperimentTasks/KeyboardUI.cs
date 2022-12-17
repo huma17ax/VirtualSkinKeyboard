@@ -129,6 +129,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
                 {
                     this.keys[target_char].timer -= Time.deltaTime;
                 }
+                Logger.Logging(new KeyLog(target_char, this.keys[target_char].rectTransform, KEY_SIZE));
             }
         }
 
@@ -141,6 +142,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         {
             this.SD_key.timer -= Time.deltaTime;
         }
+        Logger.Logging(new KeyLog('#', this.SD_key.rectTransform, KEY_DISTANCE));
 
         this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -222,6 +224,8 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         for (int i=0; i<4; i++) {
             if (this.clicked_chars[i] != this.hovered_chars[i]) this.clicked_chars[i] = ' ';
         }
+
+        Logger.Logging(new FingerHoverLog(fingertipAnchoredPositions, this.hovered_chars));
     }
 
     private static float DistancePointToLine(Vector2 point, Vector2 line)
@@ -240,7 +244,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     public void Press(int index)
     {
         char c = this.hovered_chars[index];
-        Logger.Logging(new TouchedKeyLog(c));
+        Logger.Logging(new PressedKeyLog(c, index));
         this.clicked_chars[index] = c;
         if (this.input_accepting == false)
         {
@@ -270,17 +274,25 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     public void Release(int index)
     {
         this.clicked_chars[index] = ' ';
+        Logger.Logging(new ReleasedKeyLog(index));
     }
 
     private void StartTyping()
     {
         if (this.phrase_index == phrases_set.GetLength(1)) return;
         this.input_accepting = true;
+        Logger.Logging(
+            new PhraseStateLog(
+                "Start", this.phrases_set_index, this.phrase_index,
+                phrases_set[this.phrases_set_index, this.phrase_index]));
     }
 
     private void StopTyping()
     {
         this.input_accepting = false;
+        Logger.Logging(
+            new PhraseStateLog(
+                "Stop", this.phrases_set_index, this.phrase_index, ""));
 
         // foreach (KeyValuePair<char, KeyState> target in this.keys)
         // {
@@ -306,15 +318,18 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         if (this.incorrect_chars.Length > 0)
         {
             this.incorrect_chars += c;
+            Logger.Logging(new UpdateTextLog(c.ToString(), false));
         }
         else if (this.required_chars.Length > 0 && this.required_chars[0] == c)
         {
             this.inputted_chars += this.required_chars[0];
             this.required_chars = this.required_chars.Remove(0, 1);
+            Logger.Logging(new UpdateTextLog(c.ToString(), true));
         }
         else
         {
             this.incorrect_chars += c;
+            Logger.Logging(new UpdateTextLog(c.ToString(), false));
         }
         this.phrase.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
@@ -324,11 +339,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         if (this.incorrect_chars.Length > 0)
         {
             this.incorrect_chars = this.incorrect_chars.Remove(this.incorrect_chars.Length - 1);
+            Logger.Logging(new UpdateTextLog("", true));
         }
         else if (this.inputted_chars.Length > 0)
         {
             this.required_chars = this.inputted_chars[this.inputted_chars.Length - 1] + this.required_chars;
             this.inputted_chars = this.inputted_chars.Remove(this.inputted_chars.Length - 1);
+            Logger.Logging(new UpdateTextLog("", false));
         }
         this.phrase.GetComponent<Text>().text = "<color=silver>" + this.inputted_chars + "</color><color=red>" + this.incorrect_chars + "</color>" + this.required_chars;
     }
