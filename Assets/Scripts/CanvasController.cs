@@ -44,7 +44,7 @@ public class CanvasController : MonoBehaviour
         }
         if (this.sh_foreground.TryGet(out this.colors))
         {
-            this.foreground.SetPixels32(MultiplyTransparency(0.7f, this.colors));
+            this.foreground.SetPixels32(MultiplyTransparency(0.5f, this.colors));
             this.foreground.Apply();
         }
     }
