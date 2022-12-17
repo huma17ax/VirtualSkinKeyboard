@@ -116,7 +116,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             for (int j = 0; j < keys_row.Length; j++)
             {
                 char target_char = keys_row[j];
-                Vector2 pos = scaled_marker_position + scaled_axis * ((11.25f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
+                Vector2 pos = scaled_marker_position + scaled_axis * ((10.125f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
                 this.keys[target_char].rectTransform.anchoredPosition = pos;
 
                 this.keys[target_char].rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -131,17 +131,17 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
         }
 
-        Vector2 sd_pos = scaled_marker_position + scaled_axis * (1 * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * 0f;
+        Vector2 sd_pos = scaled_marker_position + scaled_axis * (DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * 0f;
         this.SD_key.rectTransform.anchoredPosition = sd_pos;
         this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
-        float sd_scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
-        this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale * 3, 0);
+        float sd_scale = 1f / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
+        this.SD_key.rectTransform.localScale = new Vector3(17.1f * sd_scale, 55.5f * sd_scale, 0);
         if (this.SD_key.timer > 0f)
         {
             this.SD_key.timer -= Time.deltaTime;
         }
 
-        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
