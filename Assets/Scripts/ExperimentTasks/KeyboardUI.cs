@@ -58,6 +58,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     };
     public int phrases_set_index = 0;
     private int phrase_index = -1;
+    private float phrase_timer = 0;
 
     bool input_accepting = false;
 
@@ -144,6 +145,13 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.5f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
+        if (this.phrase_timer > 0f) {
+            this.phrase_timer -= Time.deltaTime;
+            if (this.phrase_timer < 0f) {
+                this.phrase_timer = 0f;
+            }
+            this.phrase.localScale = Vector3.Scale(this.phrase.localScale, new Vector3(1f - this.phrase_timer / 0.3f, this.phrase_timer, 0));
+        }
 
         this.warning.anchoredPosition = scaled_marker_position + downward * -1f;
         this.warning.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -270,10 +278,11 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     {
         this.input_accepting = false;
 
-        foreach (KeyValuePair<char, KeyState> target in this.keys)
-        {
-            target.Value.timer = 0f;
-        }
+        // foreach (KeyValuePair<char, KeyState> target in this.keys)
+        // {
+        //     target.Value.timer = 0f;
+        // }
+        this.phrase_timer = 0.3f;
 
         this.phrase_index++;
         this.inputted_chars = "";
