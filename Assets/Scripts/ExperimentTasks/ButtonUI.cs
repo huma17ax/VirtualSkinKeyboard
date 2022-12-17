@@ -149,6 +149,10 @@ public class ButtonUI : MonoBehaviour, IExperimentUI
         this.fingerPositions = fingertipAnchoredPositions;
     }
 
+    public void NotifyWristPosition(Vector2 pos) {
+        
+    }
+
     public void Press(int index)
     {
         Logger.Logging(

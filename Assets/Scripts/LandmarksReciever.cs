@@ -22,7 +22,7 @@ public class LandmarksReceiver : ThreadRunner
                     if (this.token.IsCancellationRequested) break;
                     if (pipe.status == NamedPipeServer.Status.Connected)
                     {
-                        byte[] bytes = pipe.Read(4 * 2 * 4);
+                        byte[] bytes = pipe.Read(5 * 2 * 4);
                         if (bytes == null) break;
                         this.sh_landmarks.Set(BytesToVectors(bytes));
                     }

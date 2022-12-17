@@ -21,6 +21,7 @@ public class ARMarkerDetector : MonoBehaviour
     public Vector2 nextPosition = new Vector2(0, 0);
     public Vector2 abovePosition = new Vector2(0, 0);
     public bool markerTiltWarning = false;
+    public bool isDetected = false;
 
     private bool log_flag = false;
 
@@ -41,11 +42,13 @@ public class ARMarkerDetector : MonoBehaviour
             if (this.ms.isExist(marker_id))
             {
                 this.ms.setTransform(marker_id, this.ar_obj.transform);
+                this.isDetected = true;
                 this.calcMarkerPosition();
                 this.DetectMarkerTilt();
             }
             else
             {
+                this.isDetected = false;
                 this.resetMarkerPosition();
             }
 

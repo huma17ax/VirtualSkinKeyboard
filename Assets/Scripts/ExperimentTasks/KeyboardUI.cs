@@ -37,7 +37,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private char[] hovered_chars = { ' ', ' ', ' ', ' ' };
     private bool[] is_touching = { false, false, false, false };
 
-    private RectTransform phrase, warning;
+    private RectTransform phrase, warning, warning2;
 
     private string inputted_chars = "";
     private string incorrect_chars = "";
@@ -73,6 +73,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         this.background_transform = GameObject.Find("Canvas/Background").GetComponent<RectTransform>();
         this.phrase = this.rect_transform.Find("Phrase").GetComponent<RectTransform>();
         this.warning = this.rect_transform.Find("Warning").GetComponent<RectTransform>();
+        this.warning2 = GameObject.Find("Canvas/Warning2").GetComponent<RectTransform>();
 
         for (int i = 0; i < 26; i++)
         {
@@ -115,7 +116,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             for (int j = 0; j < keys_row.Length; j++)
             {
                 char target_char = keys_row[j];
-                Vector2 pos = scaled_marker_position + scaled_axis * ((11.25f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
+                Vector2 pos = scaled_marker_position + scaled_axis * ((10.125f - j) * KEY_DISTANCE / MARKER_SIZE + offset_x + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * offset_y;
                 this.keys[target_char].rectTransform.anchoredPosition = pos;
 
                 this.keys[target_char].rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -130,24 +131,24 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             }
         }
 
-        Vector2 sd_pos = scaled_marker_position + scaled_axis * (1 * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * 0f;
+        Vector2 sd_pos = scaled_marker_position + scaled_axis * (DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * 0f;
         this.SD_key.rectTransform.anchoredPosition = sd_pos;
         this.SD_key.rectTransform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
-        float sd_scale = KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
-        this.SD_key.rectTransform.localScale = new Vector3(sd_scale, sd_scale * 3, 0);
+        float sd_scale = 1f / MARKER_SIZE * scaled_axis.magnitude / this.SD_key.rectTransform.sizeDelta.x;
+        this.SD_key.rectTransform.localScale = new Vector3(17.1f * sd_scale, 55.5f * sd_scale, 0);
         if (this.SD_key.timer > 0f)
         {
             this.SD_key.timer -= Time.deltaTime;
         }
 
-        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (6.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
+        this.phrase.anchoredPosition = scaled_marker_position + scaled_axis * (5.75f * KEY_DISTANCE / MARKER_SIZE + DISTANCE_FROM_MARKER / MARKER_SIZE) + downward * -2f * KEY_DISTANCE / MARKER_SIZE;
         this.phrase.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.phrase.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
 
         this.warning.anchoredPosition = scaled_marker_position + downward * -1f;
         this.warning.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
         this.warning.localScale = new Vector3(1, 1, 0) * KEY_SIZE / MARKER_SIZE * scaled_axis.magnitude / 40f;
-        this.warning.gameObject.SetActive(this.detector.markerTiltWarning);
+        this.warning.gameObject.SetActive(this.detector.markerTiltWarning || !this.detector.isDetected);
 
         this.UpdateKeyTextures();
     }
@@ -215,6 +216,12 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
         // 直線(ベクトル)と点の距離を返す
         float angle = Vector2.Angle(line, point) * Mathf.Deg2Rad;
         return point.magnitude * Mathf.Sin(angle);
+    }
+
+    public void NotifyWristPosition(Vector2 pos) {
+        this.warning2.anchoredPosition = new Vector2(pos.x, (-240 * this.background_transform.localScale.y)+30);
+        bool wrist_in_frame = pos.y > (-240 * this.background_transform.localScale.y);
+        this.warning2.gameObject.SetActive(!wrist_in_frame);
     }
 
     public void Press(int index)
