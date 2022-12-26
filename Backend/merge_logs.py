@@ -33,10 +33,16 @@ with open(r'.\logs\logs ({}).csv'.format(datestr), 'w', newline='') as f:
                 if b_log is None and f_log is None:
                     break
             
-                if f_log is None or b_log[0] <= f_log[0]:
+                if f_log is None:
                     writer.writerow(b_log)
                     b_log = None
-                elif b_log is None or f_log[0] < b_log[0]:
+                elif b_log is None:
+                    writer.writerow(f_log)
+                    f_log = None
+                elif b_log[0] <= f_log[0]:
+                    writer.writerow(b_log)
+                    b_log = None
+                else:
                     writer.writerow(f_log)
                     f_log = None
 
