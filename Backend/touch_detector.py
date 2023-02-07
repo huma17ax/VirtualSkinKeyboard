@@ -21,8 +21,8 @@ class TouchDetector(Thread):
         self.stop_flg = False
         self.sh_image_and_landmarks = sh_image_and_landmarks
         self.sh_touches = sh_touches
-        self.model = load_model('./model')
-        self.model.compile()
+        self.model = tf.saved_model.load('./model2')
+        # self.model.compile()
     
     def run(self):
         # In thread
@@ -40,9 +40,10 @@ class TouchDetector(Thread):
                     logging('TouchDetectLog', None)
                     continue
 
-                touches = self.model.predict([
+                touches = self.model([
                     image.reshape((1,1,50,50,3)) for image in cropped_images
                 ])
+                touches = [t.numpy() for t in touches]
                 logging('TouchDetectLog', [t[0][0][0].item() for t in touches])
                 self.sh_touches.set([t[0][0][0] > 0.5 for t in touches])
                 add_result([t[0][0][0] for t in touches])

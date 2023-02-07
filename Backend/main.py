@@ -18,6 +18,7 @@ CAMERA_INDEX = 0
 capture = cv2.VideoCapture(CAMERA_INDEX)
 
 print(capture.get(cv2.CAP_PROP_FPS))
+print("\n~~~フレーズセットのインデックス設定確認~~~\n")
 
 sh_image1 = SharedData("image1")
 sh_image2 = SharedData("image2")
