@@ -276,7 +276,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &644673632
 RectTransform:
   m_ObjectHideFlags: 0
@@ -711,7 +711,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &901459196
 RectTransform:
   m_ObjectHideFlags: 0
@@ -867,7 +867,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1631010906
 RectTransform:
   m_ObjectHideFlags: 0
@@ -902,8 +902,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyPrefab: {fileID: 2911979691747746087, guid: 91ba09d327e99504491d5525e430a7fd, type: 3}
-  phrases_set_index: 0
+  phrases_set_index: 1
   forceStop: 0
+  skipChar: 0
 --- !u!1 &1884118438
 GameObject:
   m_ObjectHideFlags: 0
