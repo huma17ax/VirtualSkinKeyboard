@@ -60,6 +60,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private Texture2D normal_key_texture, clicked_key_texture, touching_key_texture, disabled_key_texture;
 
     public bool forceStop = false;
+    public bool skipChar = false;
 
     void Start()
     {
@@ -106,6 +107,20 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
             this.incorrect_chars = "";
             this.required_chars = phrases_set[this.phrases_set_index, this.phrase_index];
             this.phrase.GetComponent<Text>().text = this.required_chars;
+        }
+        if (this.skipChar) {
+            this.skipChar = false;
+            Logger.Logging(new PressedKeyLog('@', -1));
+            if (this.incorrect_chars.Length > 0) {
+                this.DeleteChar();
+                this.SD_key.timer = 0.15f;
+            }
+            else {
+                char c = this.required_chars[0];
+                this.InputChar(c);
+                this.keys[c].timer = 0.15f;
+                if (this.required_chars == "") this.StopTyping();
+            }
         }
 
         Vector2 axis = this.detector.nextPosition - this.detector.markerPosition;
