@@ -7,3 +7,7 @@
 
 * Oculus Integration
 * NyARToolKit
+
+## Set Up
+
+[セットアップ手順](./SETUP.md)
