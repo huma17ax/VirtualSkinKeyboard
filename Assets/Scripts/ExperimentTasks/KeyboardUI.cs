@@ -23,7 +23,7 @@ public class KeyboardUI : MonoBehaviour, IExperimentUI
     private const float MARKER_SIZE = 23;// 実際のマーカーの大きさ[mm]
     private const float KEY_SIZE = 10;// キーの一辺の大きさ[mm]
     private const float KEY_DISTANCE = 15.8f;// キーの中心間の距離[mm]
-    private const float DISTANCE_FROM_MARKER = 30;// ARマーカーからキーUIの距離[mm]
+    private const float DISTANCE_FROM_MARKER = 40;// ARマーカーからキーUIの距離[mm]
     private readonly Vector2 DETECTION_CENTER_OFFSET = new Vector2(-1.88f, -0.35f);// キーの中心と当たり判定の中心の差
     private const int FONT_SIZE = 110;// キーに表示される文字の大きさ
 
