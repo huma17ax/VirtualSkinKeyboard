@@ -27,7 +27,7 @@ https://unity3d.com/jp/get-unity/download
 
 ## Install Python
 
-Pythonをインストール
+Pythonをインストール  
 https://www.python.org/downloads/
 
 ## Install CUDA
@@ -63,7 +63,7 @@ https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022
 
 NyARToolKit for Unityをダウンロード  
 https://github.com/nyatla/NyARToolkitUnity/releases  
-ダウンロードしたパッケージをUnityにて
+ダウンロードしたパッケージをUnityにて  
 　Assets > Import package > Custom package　からインポート
 
 
